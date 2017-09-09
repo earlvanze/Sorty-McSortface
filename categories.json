@@ -1,0 +1,26 @@
+[
+    {
+	"name": "plastic",
+	"keywords": [
+	    "plastic",
+	    "bottle"
+	]
+    },
+    {
+	"name": "metal",
+	"keywords": [
+	    "metal",
+	    "can"
+	]
+    },
+    {
+	"name": "paper",
+	"keywords": [
+	    "paper"
+	]
+    },
+    {
+	"name": "everything_else",
+	"keywords": []
+    }
+]
