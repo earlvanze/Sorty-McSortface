@@ -27,14 +27,14 @@ with open('categories.json') as categories_file:
     categories = json.load(categories_file)
 
 
-# 0 is everything else
+# 1 is everything else
     
 def predict(filename):
     response = model.predict_by_filename(filename)
     # check if response was ok
     if response['status']['code'] != 10000:
         # exit out
-        return 0
+        return 1
 
     # get tags
     tags = []
@@ -54,7 +54,7 @@ def predict(filename):
 #            return 4
             return category['code']
     # no intersections
-    return 0
+    return 1
 
 
 # print predict(input_file)

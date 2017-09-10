@@ -55,11 +55,11 @@ void loop(){
       if (pos == 3) {
         Serial.println("pos = 3");
         digitalWrite(ledPin, HIGH); 
-        myServo1.write(165); //write the position into the servo
+        myServo1.write(170); //write the position into the servo
         delay(servoDelay);
         myServo1.write(90);
         delay(servoDelay);
-        myServo2.write(165);
+        myServo2.write(170);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
       }
