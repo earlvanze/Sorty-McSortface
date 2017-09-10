@@ -1,37 +1,58 @@
+import sys
+import time
+sys.argv
+
+from Naked.toolshed.shell import execute_js, muterun_js
+
+result = execute_js('set_status.js processing')
+
+if len(sys.argv) < 2:
+    # error
+    print 0
+
+input_file = sys.argv[1]
+
 from clarifai import rest
 from clarifai.rest import ClarifaiApp
 import json
 
 app = ClarifaiApp(api_key='fb45dd17e3b24d3c84d012cc8f53941d')
-model = app.models.get('general-v1.3')
+model = app.models.get('materials')
+
+CONFIDENCE_LEVEL = 0.7
 
 with open('categories.json') as categories_file:
     categories = json.load(categories_file)
 
 
+# 0 is everything else
+    
 def predict(filename):
     response = model.predict_by_filename(filename)
     # check if response was ok
     if response['status']['code'] != 10000:
         # exit out
-        return 'error'
+        return 0
 
     # get tags
     tags = []
     for output in response['outputs']:
         for concept in output['data']['concepts']:
-            tags.append(concept['name'])
+            print concept['name'] + ": " + str(concept['value'])
+            if concept['value'] > CONFIDENCE_LEVEL:
+                tags.append(concept['name'])
 
-    print tags
     # determine category
     for category in categories:
         intersection = set(category['keywords']).intersection(set(tags))
         if len(intersection) > 0:
-            return category['name']
+            result = execute_js('set_status.js ' + category['name'])
+            time.sleep(1)
+            result = execute_js('set_status.js waiting')
+
+            return category['code']
     # no intersections
-    return 'none'
+    return 0
 
-files = ['lays.jpg', 'motor.jpg', 'soylent.jpg', 'coke.jpg', 'bottle.jpg', 'set.jpg', 'plastic_wrapper.jpg', 'knife.jpg', 'fork.jpg', 'utensils.jpg', 'sap.jpg', 'napkin.jpg', 'styrofoam.jpg', 'paper.jpg']
 
-for f in files:
-    print f + ": " + predict('img/' + f)
+predict(input_file)

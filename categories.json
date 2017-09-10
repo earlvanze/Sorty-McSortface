@@ -1,26 +1,23 @@
 [
     {
-	"name": "plastic",
-	"keywords": [
-	    "plastic",
-	    "bottle"
-	]
-    },
-    {
 	"name": "metal",
+	"code": 1,
 	"keywords": [
-	    "metal",
-	    "can"
+	    "metal"
 	]
     },
     {
 	"name": "paper",
+	"code": 2,
 	"keywords": [
 	    "paper"
 	]
     },
     {
-	"name": "everything_else",
-	"keywords": []
+	"name": "plastic",
+	"code": 3,
+	"keywords": [
+	    "plastic"
+	]
     }
 ]
