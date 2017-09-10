@@ -12,4 +12,7 @@ var ref = fbadmin.database().ref('/' + status);
 
 ref.transaction((count) => {
     return count + 1;
+}).then(() => {
+    fbadmin.database().goOffline();
+    fbadmin.app().delete();
 })
