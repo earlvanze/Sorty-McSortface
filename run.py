@@ -17,7 +17,7 @@ def main():
 			type = predict(input_file)
 			print(type)
 			ser.write(str(type))
-#			os.remove(input_file)
+			os.remove(input_file)
 
 
 if __name__ == '__main__':

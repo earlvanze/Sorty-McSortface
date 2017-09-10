@@ -51,8 +51,8 @@ def predict(filename):
             result = execute_js('set_status.js ' + category['name'])
             time.sleep(1)
             result = execute_js('set_status.js waiting')
-            return 4
-#            return category['code']
+#            return 4
+            return category['code']
     # no intersections
     return 0
 

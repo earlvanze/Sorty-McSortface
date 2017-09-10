@@ -1,0 +1,30 @@
+Encoder null, cannot set bitrate!
+Encoder Profile = Baseline
+bitrate = 4000000
+Encoder Profile = Baseline
+Inside NvxLiteH264DecoderLowLatencyInitNvxLiteH264DecoderLowLatencyInit set DPB and MjstreamingInside NvxLiteH265DecoderLowLatencyInitNvxLiteH265DecoderLowLatencyInit set DPB and Mjstreaming
+Available Sensor modes : 
+2592 x 1944 FR=30.000000 CF=0x1109208a10 SensorModeType=4 CSIPixelBitDepth=10 DynPixelBitDepth=10
+2592 x 1458 FR=30.000000 CF=0x1109208a10 SensorModeType=4 CSIPixelBitDepth=10 DynPixelBitDepth=10
+1280 x 720 FR=120.000000 CF=0x1109208a10 SensorModeType=4 CSIPixelBitDepth=10 DynPixelBitDepth=10
+** Message: <main:5287> iterating capture loop ....
+
+NvCameraSrc: Trying To Set Default Camera Resolution. Selected 2104x1560 FrameRate = 30.000000 ...
+
+Framerate set to : 30 at NvxVideoEncoderSetParameterNvMMLiteOpen : Block : BlockType = 4 
+===== MSENC =====
+NvMMLiteBlockCreate : Block : BlockType = 4 
+
+Starting automation...
+Image Captured 
+** Message: <main:5297> Capture completed
+** Message: <main:5347> Camera application will now exit
+0
+Traceback (most recent call last):
+  File "run.py", line 24, in <module>
+    main()
+  File "run.py", line 11, in main
+    line = ser.readline()
+  File "/usr/lib/python2.7/dist-packages/serial/serialposix.py", line 481, in read
+    ready, _, _ = select.select([self.fd], [], [], timeout)
+KeyboardInterrupt
