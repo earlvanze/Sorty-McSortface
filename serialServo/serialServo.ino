@@ -52,6 +52,7 @@ void loop(){
       pos = Serial.parseInt(); //read the position from the servo
       Serial.print("Serial parsed data received: ");
       Serial.println(pos);
+      // paper
       if (pos == 3) {
         Serial.println("pos = 3");
         digitalWrite(ledPin, HIGH); 
@@ -63,6 +64,7 @@ void loop(){
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
       }
+      // metal or plastic
       else if (pos == 2 || pos == 4 ) {
         Serial.println("pos = 2 or 4");
         digitalWrite(ledPin, HIGH); 
@@ -72,6 +74,7 @@ void loop(){
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
       }
+      // everything else (trash)
       else if (pos == 1) {
         Serial.println("pos = 1");
         digitalWrite(ledPin, HIGH); 
