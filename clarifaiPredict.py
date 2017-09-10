@@ -5,7 +5,7 @@ import os
 
 
 app = ClarifaiApp(api_key = 'fb45dd17e3b24d3c84d012cc8f53941d')
-model = app.models.get('materials')
+model = app.models.get('newMaterials')
 
 image = ClImage(file_obj=open('20170909_122423.jpg', 'rb'))
 train =  model.predict([image])
