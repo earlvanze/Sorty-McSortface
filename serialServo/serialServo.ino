@@ -44,7 +44,7 @@ void loop(){
     digitalWrite(ledPin, LOW); // turn LED OFF
     if (pirState == HIGH){
       // we have just turned off
-      Serial.println("Motion ended!");
+      Serial.println("still");
       // We only want to print on the output change, not state
       pirState = LOW;
     }
@@ -67,8 +67,9 @@ void loop(){
         Serial.println("pos = 2 or 4");
         digitalWrite(ledPin, HIGH); 
         myServo1.write(150); //write the position into the servo
-        delay(servoDelay*2);
+        delay(servoDelay);
         myServo2.write(30);
+        delay(servoDelay);
         digitalWrite(ledPin, LOW);
       }
       else if (pos == 1) {

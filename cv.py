@@ -6,11 +6,13 @@ from Naked.toolshed.shell import execute_js, muterun_js
 
 result = execute_js('set_status.js processing')
 
-if len(sys.argv) < 2:
+#if len(sys.argv) < 2:
     # error
-    print 0
+#    print 0
 
-input_file = sys.argv[1]
+#input_file = sys.argv[1]
+
+input_file = ""
 
 from clarifai import rest
 from clarifai.rest import ClarifaiApp
@@ -19,7 +21,7 @@ import json
 app = ClarifaiApp(api_key='fb45dd17e3b24d3c84d012cc8f53941d')
 model = app.models.get('materials')
 
-CONFIDENCE_LEVEL = 0.7
+CONFIDENCE_LEVEL = 0.6
 
 with open('categories.json') as categories_file:
     categories = json.load(categories_file)
@@ -38,7 +40,7 @@ def predict(filename):
     tags = []
     for output in response['outputs']:
         for concept in output['data']['concepts']:
-            print concept['name'] + ": " + str(concept['value'])
+            # print concept['name'] + ": " + str(concept['value'])
             if concept['value'] > CONFIDENCE_LEVEL:
                 tags.append(concept['name'])
 
@@ -49,10 +51,10 @@ def predict(filename):
             result = execute_js('set_status.js ' + category['name'])
             time.sleep(1)
             result = execute_js('set_status.js waiting')
-
-            return category['code']
+            return 4
+#            return category['code']
     # no intersections
     return 0
 
 
-predict(input_file)
+# print predict(input_file)
