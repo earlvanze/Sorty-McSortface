@@ -21,8 +21,9 @@ import json
 #app = ClarifaiApp(api_key='fb45dd17e3b24d3c84d012cc8f53941d')
 app = ClarifaiApp(api_key='e59b78f56ed64e12b496009fdbbe5fd0')
 model = app.models.get('recyclables')
+#model = app.models.get('aaa03c23b3724a16a56b629203edc62c')
 
-CONFIDENCE_LEVEL = 0.6
+CONFIDENCE_LEVEL = 0.7
 
 with open('categories.json') as categories_file:
     categories = json.load(categories_file)
@@ -41,7 +42,7 @@ def predict(filename):
     tags = []
     for output in response['outputs']:
         for concept in output['data']['concepts']:
-            # print concept['name'] + ": " + str(concept['value'])
+            print concept['name'] + ": " + str(concept['value'])
             if concept['value'] > CONFIDENCE_LEVEL:
                 tags.append(concept['name'])
 
@@ -56,10 +57,10 @@ def predict(filename):
 #            return 4
             return category['code']
     # no intersections
-    result = execute_js('set_status.js nonrecyclable')
-    result = execute_js('update.js ee')
-    time.sleep(1)
-    result = execute_js('set_status.js waiting')
+    #result = execute_js('set_status.js nonrecyclable')
+    #result = execute_js('update.js ee')
+    #time.sleep(1)
+    #result = execute_js('set_status.js waiting')
     return 1
 
 
