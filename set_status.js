@@ -5,7 +5,7 @@ var status = process.argv[2];
 
 fbadmin.initializeApp({
     credential: fbadmin.credential.cert(serviceAccount),
-    databaseURL: 'https://pennapps-c33bb.firebaseio.com/'
+    databaseURL: 'https://sorty-mcsortface.firebaseio.com/'
 })
 
 var ref = fbadmin.database().ref('/');

@@ -6,7 +6,7 @@ int servoPin2 = 10;
 int servoDelay = 1500; //delay to allow the servo to reach position;
 int val = 0;
 int sensorPin = 2;
-int ledPin = 12;
+int ledPin = 3;
 int pirState = LOW; 
 
 Servo myServo1; // create a servo object called myServo

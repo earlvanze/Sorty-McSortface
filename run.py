@@ -7,7 +7,8 @@ import sys
 from picamera import PiCamera
 from time import sleep
 
-path = "trash*.jpg"
+path = "trash.jpg"
+SERIAL_PORT = '/dev/ttyACM1'
 
 camera = PiCamera()
 
@@ -21,7 +22,7 @@ mode = len(sys.argv)
 is_debug = mode > 1
 
 def main():
-	ser = serial.Serial('/dev/ttyACM0', 9600)
+	ser = serial.Serial(SERIAL_PORT, 9600)
 	while True:
 		line = ser.readline()
 #		print line
@@ -53,4 +54,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main
+	main()
