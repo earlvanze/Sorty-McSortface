@@ -25,14 +25,13 @@ def main():
 	ser = serial.Serial(SERIAL_PORT, 9600)
 	while True:
 		line = ser.readline()
-		print line
+#		print line
 		if line.strip() == "still":
 			print line
 #			subprocess.call(['./capture.sh'])
 			take_photo()
                         input_file = glob.glob(path)[-1]
                         type = predict(input_file)
-#			sleep(5)
                         print(type)
                         if is_debug:
                                 type = input('1 = ee, 2 = metal, 3 = paper, 4 = plastic')
@@ -45,10 +44,10 @@ def main():
                                         material = 'paper'
                                 if type == 4:
                                         material = 'plastic'
-#                                result = execute_js('set_status.js ' + material)
-#                                result = execute_js('update.js ' + material)
-#                                time.sleep(0.1)
-#                                result = execute_js('set_status.js waiting')
+                                result = execute_js('set_status.js ' + material)
+                                result = execute_js('update.js ' + material)
+                                time.sleep(0.1)
+                                result = execute_js('set_status.js waiting')
 
 	       	        ser.write(str(type))
 #			os.remove(input_file)

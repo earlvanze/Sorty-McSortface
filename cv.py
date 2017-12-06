@@ -50,10 +50,10 @@ def predict(filename):
     for category in categories:
         intersection = set(category['keywords']).intersection(set(tags))
         if len(intersection) > 0:
-            result = execute_js('set_status.js ' + category['name'])
-            result = execute_js('update.js ' + category['name'])
-            time.sleep(1)
-            result = execute_js('set_status.js waiting')
+#            result = execute_js('set_status.js ' + category['name'])
+ #           result = execute_js('update.js ' + category['name'])
+#            time.sleep(1)
+#            result = execute_js('set_status.js waiting')
 #            return 4
             return category['code']
     # no intersections

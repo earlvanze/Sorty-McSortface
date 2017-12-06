@@ -21,7 +21,7 @@ void setup() {
 }
 
 void loop(){
-  pos = NULL;
+  pos = 0;
 //  Serial.println("start loop");
   if (myServo1.read() != 90) {
     myServo1.write(90);
@@ -49,6 +49,7 @@ void loop(){
       pirState = LOW;
     }
     if (Serial.available() > 0){ //wait until information is received from the serial port
+      pos = 0;
       pos = Serial.parseInt(); //read the position from the servo
       Serial.print("Serial parsed data received: ");
       Serial.println(pos);
@@ -77,7 +78,7 @@ void loop(){
       // everything else (trash)
       else if (pos == 1) {
         Serial.println("pos = 1");
-        digitalWrite(ledPin, HIGH); 
+        digitalWrite(ledPin, HIGH);
         myServo1.write(25); //write the position into the servo
         delay(servoDelay);
         myServo1.write(90);
