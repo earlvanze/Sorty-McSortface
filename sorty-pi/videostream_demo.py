@@ -1,5 +1,5 @@
 # import the necessary packages
-from imutils.video import VideoStream
+from imutils.video import VideoStream, FPS
 import datetime
 import argparse
 import imutils
@@ -15,13 +15,14 @@ args = vars(ap.parse_args())
 # initialize the video stream and allow the cammera sensor to warmup
 vs = VideoStream(usePiCamera=args["picamera"] > 0).start()
 time.sleep(2.0)
+fps = FPS().start()
 
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
-	frame = imutils.resize(frame, width=720)
+	frame = imutils.resize(frame, width=640)
  
 	# draw the timestamp on the frame
 	timestamp = datetime.datetime.now()
@@ -32,11 +33,19 @@ while True:
 	# show the frame
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
+
+	fps.update()
+#	print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
  
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
  
+# stop the timer and display FPS information
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
