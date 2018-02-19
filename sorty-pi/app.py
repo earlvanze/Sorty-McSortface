@@ -16,21 +16,9 @@ GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
 LABELS = 'model/object-detection.pbtxt'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 PATH_TO_LABELS = os.path.join(CWD_PATH, LABELS)
-
 NUM_CLASSES = 90
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-src', '--source', dest='video_source', type=int,
-                    default=0, help='Device index of the camera.')
-parser.add_argument('-wd', '--width', dest='width', type=int,
-                    default=580, help='Width of the frames in the video stream.')
-parser.add_argument('-ht', '--height', dest='height', type=int,
-                    default=460, help='Height of the frames in the video stream.')
-parser.add_argument("-p", "--picamera", type=int, default=-1,
-                    help="whether or not the Raspberry Pi camera should be used")
-args = vars(parser.parse_args())
 
-# Loading label map
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(
     label_map,
@@ -42,11 +30,13 @@ category_index = label_map_util.create_category_index(categories)
 
 
 def detect_objects(image_np, sess, detection_graph):
-    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+    # Expand dimensions since the model expects
+    # images to have shape: [1, None, None, 3]
     image_np_expanded = np.expand_dims(image_np, axis=0)
     image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
 
-    # Each box represents a part of the image where a particular object was detected.
+    # Each box represents a part of the image
+    # where a particular object was detected.
     boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
 
     # Each score represent how level of confidence for each of the objects.
@@ -77,10 +67,10 @@ def detect_objects(image_np, sess, detection_graph):
     return image_np, output_dict
 
 
-def serialize(output_dict):
+def serialize(output_dict, confidence=.75):
     ts = datetime.now().strftime('%Y-%m-%dT%H:%M:%S:%f')
     scores = output_dict['detection_scores']
-    indices = [idx for idx, score in enumerate(scores) if score > .75]
+    indices = [idx for idx, score in enumerate(scores) if score > confidence]
     predictions = [{
         'id': idx,
         'score': scores[idx],
@@ -94,8 +84,60 @@ def serialize(output_dict):
     return predictions
 
 
+def user_args():
+    ap = argparse.ArgumentParser()
+    # video source
+    ap.add_argument(
+        '-src',
+        '--source',
+        dest='video_source',
+        type=int,
+        default=0,
+        help='Device index of the camera.'
+    )
+    # video width
+    ap.add_argument(
+        '-wd',
+        '--width',
+        dest='width',
+        type=int,
+        default=580,
+        help='Width of the frames in the video stream.'
+    )
+    # video height
+    ap.add_argument(
+        '-ht',
+        '--height',
+        dest='height',
+        type=int,
+        default=460,
+        help='Height of the frames in the video stream.'
+    )
+    # frame rate
+    ap.add_argument(
+        "-fr",
+        "--frame_rate",
+        type=int,
+        default=30,
+        help="whether or not the Raspberry Pi camera should be used"
+    )
+    # use pi camara?
+    ap.add_argument(
+        "-p",
+        "--picamera",
+        type=int,
+        default=-1,
+        help="whether or not the Raspberry Pi camera should be used"
+    )
+    return ap.parse_args()
+
+
 if __name__ == '__main__':
+    # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
+    # get user args
+    args = user_args()
+    # load tensorflow graph
     detection_graph = tf.Graph()
     with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
@@ -103,29 +145,31 @@ if __name__ == '__main__':
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
+        # initialize tf session
         sess = tf.Session(graph=detection_graph)
-
+    # start video stream
     video_capture = VideoStream(
-        usePiCamera=args["picamera"] > 0,
-        resolution=(640, 480),
-        framerate=32
+        usePiCamera=args.picamera > 0,
+        resolution=(args.width, args.height),
+        framerate=args.frame_rate
     ).start()
-
+    # sleep for 2 seconds...
     time.sleep(2.0)
-
+    # start frames per second timer
     fps = FPS().start()
-
-    while True:  # fps._numFrames < 120
-        frame = video_capture.read()
+    # while fps._numFrames < 120
+    while True:
+        raw_frame = video_capture.read()
         t = time.time()
+        # set information
         ts_text = datetime.now().strftime("%A %d %B %Y %I:%M:%S%p")
-        position = (10, frame.shape[0] - 10)
+        position = (10, raw_frame.shape[0] - 10)
         font_face = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 0.35
         color = (0, 0, 255)
-
+        # put information text in the lower bottom corner
         cv2.putText(
-            frame,
+            raw_frame,
             ts_text,
             position,
             font_face,
@@ -133,22 +177,23 @@ if __name__ == '__main__':
             color,
             1
         )
-
-        output_rgb = cv2.cvtColor(
-            frame,
+        # transform image into rgb
+        rgb_frame = cv2.cvtColor(
+            raw_frame,
             cv2.COLOR_RGB2BGR
         )
-
-        out_tf_frame, output_dict = detect_objects(
-            output_rgb,
+        # get img and raw output
+        frame, raw_output = detect_objects(
+            rgb_frame,
             sess,
             detection_graph
         )
-
-        output = serialize(output_dict)
-        cv2.imshow('Video', out_tf_frame)
-
-        if output:  # log results to sample.log
+        # serialize output
+        output = serialize(raw_output)
+        # show image
+        cv2.imshow('Video', frame)
+        if output:
+            # log results to sample.log
             print(output)
             logging.info(output)
         else:
@@ -161,6 +206,7 @@ if __name__ == '__main__':
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
-
+    # stop video
     video_capture.stop()
+    # destroy window
     cv2.destroyAllWindows()
