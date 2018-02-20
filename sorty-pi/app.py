@@ -171,6 +171,10 @@ def main():
         resolution=(args.width, args.height),
         framerate=args.frame_rate
     ).start()
+    # set up video writer format
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    # set up video writer
+    video_writer = cv2.VideoWriter('output.m4v', fourcc, 30.0, (640, 480))
     # sleep for 2 seconds...
     time.sleep(2.0)
     # start frames per second timer
@@ -238,9 +242,13 @@ def main():
 #        else:
 #            print("Nothing detected.")
 
-        key = cv2.waitKey(1) & 0xFF
         fps.update()
 #        print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))
+
+        # write raw frame to video stream
+        video_writer.write(raw_frame)
+
+        key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
 
@@ -249,6 +257,8 @@ def main():
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
     # stop video
     video_capture.stop()
+    # release video stream
+    video_writer.release()
     # destroy window
     cv2.destroyAllWindows()
     ser.close()
