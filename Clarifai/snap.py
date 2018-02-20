@@ -1,9 +1,7 @@
-import pygame
-import pygame.camera
 from pygame.locals import *
 from datetime import datetime
 
-import cv2
+from Clarifai import cv2
 
 cap = cv2.VideoCapture(0)
 #pygame.init()

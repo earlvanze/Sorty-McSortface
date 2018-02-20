@@ -1,8 +1,6 @@
-import subprocess
 import serial
 import glob
-import os
-from cv import *
+from Clarifai.cv import *
 import sys
 from picamera import PiCamera
 from time import sleep

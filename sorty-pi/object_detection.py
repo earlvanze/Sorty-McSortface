@@ -1,9 +1,8 @@
 import os
-import cv2
+from Clarifai import cv2
 import time
 import argparse
 import datetime
-import imutils
 import numpy as np
 import tensorflow as tf
 
@@ -131,8 +130,8 @@ if __name__ == '__main__':
 	# draw the timestamp on the frame
         timestamp = datetime.datetime.now()
         ts = timestamp.strftime("%A %d %B %Y %I:%M:%S%p")
-        cv2.putText(frame, ts, (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 
-		0.35, (0, 0, 255), 1)
+        cv2.putText(frame, ts, (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.35, (0, 0, 255), 1)
 
         output_rgb = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         out_tf_frame = detect_objects(output_rgb, sess, detection_graph)
