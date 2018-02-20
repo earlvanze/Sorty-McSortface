@@ -1,4 +1,4 @@
-from clarifai import rest
+from Clarifai import rest
 from clarifai.rest import ClarifaiApp
 from clarifai.rest import Image as ClImage
 import os

@@ -14,7 +14,7 @@ result = execute_js('set_status.js processing')
 
 input_file = ""
 
-from clarifai import rest
+from Clarifai import rest
 from clarifai.rest import ClarifaiApp
 import json
 

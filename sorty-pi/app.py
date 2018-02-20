@@ -5,11 +5,18 @@ import argparse
 import logging
 import numpy as np
 import tensorflow as tf
+import serial
+import re
 
 from datetime import datetime
 from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
+
+#SERIAL_PORT = '/dev/ttyACM0'
+SERIAL_PORT = '/dev/tty.usbmodem1421'
+BAUD = 9600
+TOUT = 3.0
 
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
@@ -83,6 +90,15 @@ def serialize(output_dict, confidence=.75):
     ]
     return predictions
 
+def readSerial(ser,term):
+    matcher = re.compile(term)    #gives you the ability to search for anything
+    tic     = time.time()
+    buff    = ser.read(128)
+    # you can use if not ('\n' in buff) too if you don't like re
+    while ((time.time() - tic) < TOUT) and (not matcher.search(buff)):
+       buff += ser.read(128)
+
+    return buff
 
 def user_args():
     ap = argparse.ArgumentParser()
@@ -118,8 +134,8 @@ def user_args():
         "-fr",
         "--frame_rate",
         type=int,
-        default=30,
-        help="whether or not the Raspberry Pi camera should be used"
+        default=4,
+        help="Framerate of video stream."
     )
     # use pi camara?
     ap.add_argument(
@@ -131,8 +147,10 @@ def user_args():
     )
     return ap.parse_args()
 
+def main():
+    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+    print(ser.name)  # check which port was really used
 
-if __name__ == '__main__':
     # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
     # get user args
@@ -159,6 +177,11 @@ if __name__ == '__main__':
     fps = FPS().start()
     # while fps._numFrames < 120
     while True:
+        # read Arduino PIR sensor state
+        status = ser.readline().decode('utf-8').strip("\r\n")
+#        status = readSerial(ser, "still")
+        print(status)
+
         raw_frame = video_capture.read()
         t = time.time()
         # set information
@@ -189,20 +212,38 @@ if __name__ == '__main__':
             detection_graph
         )
         # serialize output
-        output = serialize(raw_output)
+        predictions = serialize(raw_output)
+
         # show image
         cv2.imshow('Video', frame)
-        if output:
+        if predictions:
+            # sample output
+            # [{'id': 0, 'score': 0.98922765, 'class': 1, 'label': 'metal',
+            # 'bbox': [0.2890249, 0.39757824, 0.714632, 0.6900569],
+            # 'time': '2018-02-20T10:46:11:207357'}]
+            for prediction in predictions:
+                print(prediction['class'])
+                if status == "still":
+                    ser.write(str(prediction['class']).encode())
+#                    status = readSerial(ser, "done")
+#                    status = ser.readline().decode('utf-8').strip("\r\n")
+#                    if status != "done":
+#                        status = ser.readline().decode('utf-8').strip("\r\n")
+#                        print(status)
+#                        time.sleep(0.1)
+
             # log results to sample.log
-            print(output)
-            logging.info(output)
-        else:
-            print("Nothing detected.")
-        key = cv2.waitKey(33) & 0xFF
+            logging.info(predictions)
+
+#        else:
+#            print("Nothing detected.")
+
+        key = cv2.waitKey(1) & 0xFF
         fps.update()
-        print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+#        print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))
+        if key == ord('q'):
             break
+
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
@@ -210,3 +251,8 @@ if __name__ == '__main__':
     video_capture.stop()
     # destroy window
     cv2.destroyAllWindows()
+    ser.close()
+
+
+if __name__ == '__main__':
+	main()

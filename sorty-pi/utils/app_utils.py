@@ -6,7 +6,7 @@
 import struct
 import six
 import collections
-import cv2
+from Clarifai import cv2
 import datetime
 from threading import Thread
 from matplotlib import colors
@@ -277,4 +277,5 @@ def draw_boxes_and_labels(
         rect_points.append(dict(ymin=ymin, xmin=xmin, ymax=ymax, xmax=xmax))
         class_names.append(box_to_display_str_map[box])
         class_colors.append(color_rgb[color.lower()])
+        print (class_names)
     return rect_points, class_names, class_colors

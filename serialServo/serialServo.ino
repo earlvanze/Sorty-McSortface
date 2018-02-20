@@ -1,17 +1,17 @@
 #include <Servo.h>
 
-int pos; // variable to store bin selection
+int item; // variable to store bin selection
 int servoPin1 = 9; //declare pin for the servo
 int servoPin2 = 10;
 int servoDelay = 1500; //delay to allow the servo to reach position;
 int val = 0;
 int sensorPin = 2;
-int ledPin = 3;
+int ledPin = 13;
 int pirState = LOW; 
 
 Servo myServo1; // create a servo object called myServo
 Servo myServo2;
- 
+
 void setup() {
   Serial.begin(9600); //start serial port
   myServo1.attach(servoPin1); //declare to which pin is the servo connected
@@ -21,8 +21,8 @@ void setup() {
 }
 
 void loop(){
-  pos = 0;
-//  Serial.println("start loop");
+  item = 0;
+//  Serial.println("No motion detected.");
   if (myServo1.read() != 90) {
     myServo1.write(90);
     delay(servoDelay);
@@ -49,41 +49,44 @@ void loop(){
       pirState = LOW;
     }
     if (Serial.available() > 0){ //wait until information is received from the serial port
-      pos = 0;
-      pos = Serial.parseInt(); //read the position from the servo
+      item = 0;
+      item = Serial.parseInt(); // read the item from serial port
       Serial.print("Serial parsed data received: ");
-      Serial.println(pos);
-      // paper
-      if (pos == 3) {
-        Serial.println("pos = 3");
+      Serial.println(item);
+      // metal
+      if (item == 1) {
+        Serial.println("item = 1 // metal");
         digitalWrite(ledPin, HIGH); 
-        myServo1.write(170); //write the position into the servo
+        myServo1.write(170);
         delay(servoDelay);
         myServo1.write(90);
         delay(servoDelay);
         myServo2.write(170);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
+        Serial.println("done");
       }
-      // metal or plastic
-      else if (pos == 2 || pos == 4 ) {
-        Serial.println("pos = 2 or 4");
+      // plastic
+      else if (item == 2) {
+        Serial.println("item = 2 // plastic");
         digitalWrite(ledPin, HIGH); 
-        myServo1.write(150); //write the position into the servo
+        myServo1.write(150);
         delay(servoDelay);
         myServo2.write(30);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
+        Serial.println("done");
       }
-      // everything else (trash)
-      else if (pos == 1) {
-        Serial.println("pos = 1");
+      // paper or everything else (trash)
+      else if (item == 3 || item == 4) {
+        Serial.println("item = 3 or 4 // paper or trash");
         digitalWrite(ledPin, HIGH);
-        myServo1.write(25); //write the position into the servo
+        myServo1.write(25);
         delay(servoDelay);
         myServo1.write(90);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
+        Serial.println("done");
       }
       else {
         Serial.println("Not a valid option");
