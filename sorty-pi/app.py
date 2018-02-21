@@ -1,4 +1,5 @@
 import os
+import re
 import cv2
 import time
 import argparse
@@ -6,8 +7,7 @@ import logging
 import numpy as np
 import tensorflow as tf
 import serial
-import re
-
+import json
 from datetime import datetime
 from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
@@ -153,7 +153,6 @@ def user_args():
 def main():
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
     print(ser.name)  # check which port was really used
-
     # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
     # get user args
@@ -186,7 +185,6 @@ def main():
     while True:
         # read Arduino PIR sensor state
         status = ser.readline().decode('utf-8').strip("\r\n")
-
         raw_frame = video_capture.read()
         t = time.time()
         # set information
@@ -221,19 +219,23 @@ def main():
         # show image
         cv2.imshow('Video', frame)
         if predictions and status == 'still':
+            print(status)
             class_prediction = str(predictions[0]['class']).encode()
             ser.write(class_prediction)
             # log results to sample.log
             logging.info(predictions)
+            print(json.dumps(predictions, indent=4))
         elif status == "still":
             ser.write(str(4).encode())
+            print("TRASH!!!!!")
+        else:
+            print("Waiting for something....")
         fps.update()
         # write raw frame to video stream
         video_writer.write(raw_frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
-
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
