@@ -90,15 +90,17 @@ def serialize(output_dict, confidence=.75):
     ]
     return predictions
 
-def readSerial(ser,term):
-    matcher = re.compile(term)    #gives you the ability to search for anything
-    tic     = time.time()
-    buff    = ser.read(128)
+
+def readSerial(ser, term):
+    matcher = re.compile(term)  # gives you the ability to search for anything
+    tic = time.time()
+    buff = ser.read(128)
     # you can use if not ('\n' in buff) too if you don't like re
     while ((time.time() - tic) < TOUT) and (not matcher.search(buff)):
-       buff += ser.read(128)
+        buff += ser.read(128)
 
     return buff
+
 
 def user_args():
     ap = argparse.ArgumentParser()
@@ -147,6 +149,7 @@ def user_args():
     )
     return ap.parse_args()
 
+
 def main():
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
     print(ser.name)  # check which port was really used
@@ -183,8 +186,6 @@ def main():
     while True:
         # read Arduino PIR sensor state
         status = ser.readline().decode('utf-8').strip("\r\n")
-#        status = readSerial(ser, "still")
-        print(status)
 
         raw_frame = video_capture.read()
         t = time.time()
@@ -217,43 +218,18 @@ def main():
         )
         # serialize output
         predictions = serialize(raw_output)
-
         # show image
         cv2.imshow('Video', frame)
-        if predictions:
-            # sample output
-            # [{'id': 0, 'score': 0.98922765, 'class': 1, 'label': 'metal',
-            # 'bbox': [0.2890249, 0.39757824, 0.714632, 0.6900569],
-            # 'time': '2018-02-20T10:46:11:207357'}]
-            labelClass = str(predictions[0]['class']).encode()
-            print(predictions[0]['label'])
-            if status == "still":
-                ser.write(labelClass)
-#            for prediction in predictions:
-#                print(prediction['class'])
-#                if status == "still":
-#                   ser.write(str(prediction['class']).encode())
-#                    status = readSerial(ser, "done")
-#                    status = ser.readline().decode('utf-8').strip("\r\n")
-#                    if status != "done":
-#                        status = ser.readline().decode('utf-8').strip("\r\n")
-#                        print(status)
-#                        time.sleep(0.1)
-
+        if predictions and status == 'still':
+            class_prediction = str(predictions[0]['class']).encode()
+            ser.write(class_prediction)
             # log results to sample.log
             logging.info(predictions)
-
-        else:
-            print("Nothing detected.")
-            if status == "still":
-                ser.write(str(4).encode())
-
+        elif status == "still":
+            ser.write(str(4).encode())
         fps.update()
-#        print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))
-
         # write raw frame to video stream
         video_writer.write(raw_frame)
-
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
@@ -271,4 +247,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+    main()
