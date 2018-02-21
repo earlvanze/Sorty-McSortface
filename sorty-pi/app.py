@@ -225,10 +225,12 @@ def main():
             # [{'id': 0, 'score': 0.98922765, 'class': 1, 'label': 'metal',
             # 'bbox': [0.2890249, 0.39757824, 0.714632, 0.6900569],
             # 'time': '2018-02-20T10:46:11:207357'}]
-            for prediction in predictions:
-                print(prediction['class'])
-                if status == "still":
-                    ser.write(str(prediction['class']).encode())
+            print(predictions[0]['class'])
+            ser.write(str(predictions[0]['class']).encode())
+#            for prediction in predictions:
+#                print(prediction['class'])
+#                if status == "still":
+#                   ser.write(str(prediction['class']).encode())
 #                    status = readSerial(ser, "done")
 #                    status = ser.readline().decode('utf-8').strip("\r\n")
 #                    if status != "done":
