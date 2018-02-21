@@ -228,10 +228,7 @@ def main():
             labelClass = str(predictions[0]['class']).encode()
             print(predictions[0]['label'])
             if status == "still":
-                if labelClass == (1 || 2):
-                    ser.write(labelClass)
-                else:
-                    ser.write(str(4).encode())
+                ser.write(labelClass)
 #            for prediction in predictions:
 #                print(prediction['class'])
 #                if status == "still":
