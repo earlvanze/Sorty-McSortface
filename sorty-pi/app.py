@@ -184,7 +184,10 @@ def main():
     # while fps._numFrames < 120
     while True:
         # read Arduino PIR sensor state
-        status = ser.readline().decode('utf-8').strip("\r\n")
+        try:
+            status = ser.readline().decode('utf-8').strip("\r\n")
+        except:
+            status = 'still'
         raw_frame = video_capture.read()
         t = time.time()
         # set information
