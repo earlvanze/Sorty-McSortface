@@ -225,8 +225,13 @@ def main():
             # [{'id': 0, 'score': 0.98922765, 'class': 1, 'label': 'metal',
             # 'bbox': [0.2890249, 0.39757824, 0.714632, 0.6900569],
             # 'time': '2018-02-20T10:46:11:207357'}]
-            print(predictions[0]['class'])
-            ser.write(str(predictions[0]['class']).encode())
+            labelClass = str(predictions[0]['class']).encode()
+            print(predictions[0]['label'])
+            if status == "still":
+                if labelClass == (1 || 2):
+                    ser.write(labelClass)
+                else:
+                    ser.write(str(4).encode())
 #            for prediction in predictions:
 #                print(prediction['class'])
 #                if status == "still":
@@ -241,8 +246,10 @@ def main():
             # log results to sample.log
             logging.info(predictions)
 
-#        else:
-#            print("Nothing detected.")
+        else:
+            print("Nothing detected.")
+            if status == "still":
+                ser.write(str(4).encode())
 
         fps.update()
 #        print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))

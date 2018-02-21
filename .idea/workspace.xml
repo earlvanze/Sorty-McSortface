@@ -38,8 +38,8 @@
           <file leaf-file-name="serialServo.ino" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/serialServo/serialServo.ino">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="201">
-                  <caret line="24" column="6" lean-forward="false" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="6" />
+                <state relative-caret-position="705">
+                  <caret line="83" column="27" lean-forward="true" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
                   <folding />
                 </state>
               </provider>
@@ -96,8 +96,8 @@
           <file leaf-file-name="app.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sorty-pi/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="281">
-                  <caret line="230" column="43" lean-forward="true" selection-start-line="230" selection-start-column="43" selection-end-line="230" selection-end-column="43" />
+                <state relative-caret-position="502">
+                  <caret line="235" column="43" lean-forward="true" selection-start-line="235" selection-start-column="43" selection-end-line="235" selection-end-column="43" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
@@ -128,8 +128,8 @@
       <find>worker</find>
       <find>serial</find>
       <find>pos</find>
-      <find>readline()</find>
       <find>frame</find>
+      <find>readline()</find>
       <find>still</find>
     </findStrings>
   </component>
@@ -217,6 +217,19 @@
               <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
               <item name="Sorty-McSortface" type="462c0819:PsiDirectoryNode" />
               <item name="sorty-pi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Sorty-McSortface" type="462c0819:PsiDirectoryNode" />
+              <item name="sorty-pi" type="462c0819:PsiDirectoryNode" />
+              <item name="model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Sorty-McSortface" type="462c0819:PsiDirectoryNode" />
+              <item name="sorty-pi" type="462c0819:PsiDirectoryNode" />
+              <item name="model" type="462c0819:PsiDirectoryNode" />
+              <item name="ssd_mobilenet_v1_coco_2017_11_17" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
@@ -578,6 +591,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sorty-pi/Makefile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="36" lean-forward="true" selection-start-line="9" selection-start-column="36" selection-end-line="9" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sorty-pi/run.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -588,16 +609,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/serialServo/serialServo.ino">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="24" column="6" lean-forward="false" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="6" />
+        <state relative-caret-position="705">
+          <caret line="83" column="27" lean-forward="true" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sorty-pi/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="230" column="43" lean-forward="true" selection-start-line="230" selection-start-column="43" selection-end-line="230" selection-end-column="43" />
+        <state relative-caret-position="502">
+          <caret line="235" column="43" lean-forward="true" selection-start-line="235" selection-start-column="43" selection-end-line="235" selection-end-column="43" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
