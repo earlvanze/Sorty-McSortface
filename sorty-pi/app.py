@@ -224,12 +224,13 @@ def main():
             ser.write(class_prediction)
             # log results to sample.log
             logging.info(predictions)
-            print(json.dumps(predictions, indent=4))
+            print(predictions)
         elif status == "still":
             ser.write(str(4).encode())
             print("TRASH!!!!!")
         else:
             print("Waiting for something....")
+        time.sleep(1)
         fps.update()
         # write raw frame to video stream
         video_writer.write(raw_frame)
