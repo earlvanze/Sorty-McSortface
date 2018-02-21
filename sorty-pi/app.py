@@ -13,8 +13,8 @@ from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-#SERIAL_PORT = '/dev/ttyACM0'
-SERIAL_PORT = '/dev/tty.usbmodem1421'
+SERIAL_PORT = '/dev/ttyACM0'
+#SERIAL_PORT = '/dev/tty.usbmodem1421'
 BAUD = 9600
 TOUT = 3.0
 
