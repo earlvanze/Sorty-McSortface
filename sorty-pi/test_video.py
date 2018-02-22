@@ -2,13 +2,13 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
-from Clarifai import cv2
+from cv2 import cv2
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
-camera.resolution = (1280, 720)
+camera.resolution = (1920, 1080)
 camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(1280, 720))
+rawCapture = PiRGBArray(camera, size=(1920, 1080))
  
 # allow the camera to warmup
 time.sleep(0.1)

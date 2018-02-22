@@ -184,10 +184,7 @@ def main():
     # while fps._numFrames < 120
     while True:
         # read Arduino PIR sensor state
-        try:
-            status = ser.readline().decode('utf-8').strip("\r\n")
-        except:
-            status = 'still'
+        status = ser.readline().decode('utf-8').strip("\r\n")
         raw_frame = video_capture.read()
         t = time.time()
         # set information
@@ -219,6 +216,7 @@ def main():
         )
         # serialize output
         predictions = serialize(raw_output)
+        print(predictions)
         # show image
         cv2.imshow('Video', frame)
         if predictions and status == 'still':
@@ -231,9 +229,10 @@ def main():
         elif status == "still":
             ser.write(str(4).encode())
             print("TRASH!!!!!")
+            time.sleep(2)
         else:
             print("Waiting for something....")
-        time.sleep(1)
+            time.sleep(2)
         fps.update()
         # write raw frame to video stream
         video_writer.write(raw_frame)

@@ -4,7 +4,7 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
-from Clarifai import cv2
+from cv2 import cv2
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
