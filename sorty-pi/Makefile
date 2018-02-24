@@ -6,7 +6,7 @@ download_model: ## Download both ssd mobilenets and inception.
 
 download_ssd_mobilenets: ## Download inference graph for mobilenets.
 	rm -rf inference_graph
-	wget -O inference_graph.tar.gz https://s3.amazonaws.com/sorty-ai/trained_models/ssd_mobilenet_v1_coco/v3/inference_graph.tar.gz
+	wget -O inference_graph.tar.gz https://s3.amazonaws.com/sorty-ai/trained_models/ssd_mobilenet_v1_coco/v4/inference_graph.tar.gz
 	tar -xzvf inference_graph.tar.gz
 	rm -rf inference_graph.tar.gz
 
