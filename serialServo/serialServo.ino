@@ -57,11 +57,11 @@ void loop(){
       if (item == 1) {
         Serial.println("item = 1 // metal");
         digitalWrite(ledPin, HIGH); 
-        myServo1.write(155);
+        myServo1.write(150);
         delay(servoDelay);
         myServo1.write(90);
         delay(servoDelay);
-        myServo2.write(155);
+        myServo2.write(150);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
         Serial.println("done");
