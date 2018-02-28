@@ -3,7 +3,7 @@
 int item; // variable to store bin selection
 int servoPin1 = 9; //declare pin for the servo
 int servoPin2 = 10;
-int servoDelay = 1500; //delay to allow the servo to reach position;
+int servoDelay = 800; //delay to allow the servo to reach position;
 int val = 0;
 int sensorPin = 2;
 int ledPin = 13;
@@ -57,11 +57,11 @@ void loop(){
       if (item == 1) {
         Serial.println("item = 1 // metal");
         digitalWrite(ledPin, HIGH); 
-        myServo1.write(150);
+        myServo1.write(140);
         delay(servoDelay);
         myServo1.write(90);
         delay(servoDelay);
-        myServo2.write(150);
+        myServo2.write(130);
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
         Serial.println("done");

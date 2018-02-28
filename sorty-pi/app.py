@@ -74,7 +74,7 @@ def detect_objects(image_np, sess, detection_graph):
     return image_np, output_dict
 
 
-def serialize(output_dict, confidence=.75):
+def serialize(output_dict, confidence=.6):
     ts = datetime.now().strftime('%Y-%m-%dT%H:%M:%S:%f')
     scores = output_dict['detection_scores']
     indices = [idx for idx, score in enumerate(scores) if score > confidence]
@@ -119,7 +119,7 @@ def user_args():
         '--width',
         dest='width',
         type=int,
-        default=580,
+        default=1280,
         help='Width of the frames in the video stream.'
     )
     # video height
@@ -128,7 +128,7 @@ def user_args():
         '--height',
         dest='height',
         type=int,
-        default=460,
+        default=720,
         help='Height of the frames in the video stream.'
     )
     # frame rate
@@ -176,7 +176,7 @@ def main():
     # set up video writer format
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # set up video writer
-    video_writer = cv2.VideoWriter('output.m4v', fourcc, 30.0, (640, 480))
+    video_writer = cv2.VideoWriter('output.m4v', fourcc, 30.0, (1280, 720))
     # sleep for 2 seconds...
     time.sleep(2.0)
     # start frames per second timer
