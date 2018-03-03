@@ -155,7 +155,6 @@ def user_args():
     ap.add_argument(
         "-p",
         "--picamera",
-        dest='use_picamera'
         type=int,
         default=-1,
         help="whether or not the Raspberry Pi camera should be used"
@@ -196,7 +195,7 @@ def main():
 
     if (args.use_jetsoncam):
         SERIAL_PORT = '/dev/ttyS0'
-    elif (args.use_picamera):
+    elif (args.picamera):
         SERIAL_PORT = '/dev/ttyACM0'
     else:
         SERIAL_PORT = '/dev/tty.usbmodem1421'
@@ -205,9 +204,8 @@ def main():
     print(ser.name)  # check which port was really used
 
     # load tensorflow graph
-    detection_graph = tf.Graph()
- 
-   with detection_graph.as_default():
+    detection_graph = tf.Graph() 
+    with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
         with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
             serialized_graph = fid.read()
