@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 import serial
 import json
-from app.utils import FPS, VideoStream
+from utils.app_utils import FPS, VideoStream
 from datetime import datetime
 #from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
@@ -179,8 +179,6 @@ def user_args():
 
 
 def main():
-    print("Called with args:")
-    print(args)
     print("OpenCV version: {}".format(cv2.__version__))
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
     print(ser.name)  # check which port was really used
@@ -190,6 +188,8 @@ def main():
 
     # get user args
     args = user_args()
+    print("Called with args:")
+    print(args)
 
     # load tensorflow graph
     detection_graph = tf.Graph()
