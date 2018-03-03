@@ -45,12 +45,10 @@ class FPS:
 
 
 class WebcamVideoStream:
-    def __init__(self, src, width, height):
+    def __init__(self, src=0):
         # initialize the video camera stream and read the first frame
         # from the stream
         self.stream = cv2.VideoCapture(src)
-        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         (self.grabbed, self.frame) = self.stream.read()
 
         # initialize the variable used to indicate if the thread should
@@ -80,18 +78,18 @@ class WebcamVideoStream:
         # indicate that the thread should be stopped
         self.stopped = True
 
-    def open_cam_usb(dev, width, height):
+    def open_cam_usb(src, width, height):
         # We want to set width and height here, otherwise we could just do:
         #     return cv2.VideoCapture(dev)
         gst_str = ("v4l2src device=/dev/video{} ! "
                    "video/x-raw, width=(int){}, height=(int){}, format=(string)RGB ! "
-                   "videoconvert ! appsink").format(dev, width, height)
+                   "videoconvert ! appsink").format(src, width, height)
         return cv2.VidpeoCapture(gst_str, cv2.CAP_GSTREAMER)
 
 
 # Unifying picamera, Jetson camera, and cv2.VideoCapture into a single class with OpenCVPython
 class VideoStream:
-    def __init__(self, src=0, usePiCamera=False, resolution=(1280, 720),
+    def __init__(self, src=0, usePiCamera=False, use_jetsoncam=False, resolution=(1280, 720),
         framerate=32):
         # check to see if the picamera module should be used
         if usePiCamera:
@@ -108,15 +106,13 @@ class VideoStream:
 
         # check to see if the Jetson camera module should be used
         elif use_jetsoncam:
-
-
             # initialize the jetson camera stream and allow the camera
             # sensor to warmup
             self.stream = JetsonVideoStream(resolution=resolution,
                 framerate=framerate)
 
         # otherwise, we are using OpenCV so initialize the webcam stream
-        if use_usb:
+        else:
             self.stream = WebcamVideoStream(src=src)
 
     def start(self):
@@ -137,7 +133,7 @@ class VideoStream:
 
 
 class JetsonVideoStream:
-    def __init__(self, resolution=(1280, 720), framerate=32):
+    def __init__(self, resolution=(1280, 720), framerate=30):
         # initialize the video camera stream and read the first frame
         # from the stream
         gst_str = ("nvcamerasrc ! "
@@ -183,7 +179,7 @@ class JetsonVideoStream:
 
 
 class PiVideoStream:
-    def __init__(self, resolution=(1280, 720), framerate=32):
+    def __init__(self, resolution=(1280, 720), framerate=30):
         # initialize the camera and stream
         self.camera = PiCamera()
         self.camera.resolution = resolution

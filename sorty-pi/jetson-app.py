@@ -14,9 +14,9 @@ from datetime import datetime
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-SERIAL_PORT = '/dev/ttyS0'
+#SERIAL_PORT = '/dev/ttyS0'
 #SERIAL_PORT = '/dev/ttyACM0'
-#SERIAL_PORT = '/dev/tty.usbmodem1421'
+SERIAL_PORT = '/dev/tty.usbmodem1421'
 BAUD = 9600
 TOUT = 3.0
 
@@ -26,7 +26,7 @@ LABELS = 'model/object-detection.pbtxt'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 PATH_TO_LABELS = os.path.join(CWD_PATH, LABELS)
 NUM_CLASSES = 90
-
+windowName = "Sorty"
 
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(
@@ -145,7 +145,7 @@ def user_args():
         "-fr",
         "--frame_rate",
         type=int,
-        default=4,
+        default=30,
         help="Framerate of video stream."
     )
     # use pi camera?
@@ -207,14 +207,12 @@ def main():
         usePiCamera=args.picamera > 0,
         resolution=(args.width, args.height),
         framerate=args.frame_rate,
-        use_rtsp=args.use_rtsp,
-        rtsp_uri=args.rtsp_uri,
-        rtsp_latency=args.rtsp_latency,
+#        use_rtsp=args.use_rtsp,
+#        rtsp_uri=args.rtsp_uri,
+#        rtsp_latency=args.rtsp_latency,
         use_jetsoncam=args.use_jetsoncam,
         src=args.video_source
     ).start()
-    if not video_capture.isOpened():
-        sys.exit("Failed to open camera!")
 
     # set up video writer format
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
@@ -228,6 +226,7 @@ def main():
     showHelp = True
     showFullScreen = False
     helpText = "'Esc' or 'Q' to Quit, 'H' to Toggle Help, 'F' to Toggle Fullscreen"
+    font = cv2.FONT_HERSHEY_PLAIN
 
     while True:
         # read Arduino PIR sensor state
@@ -266,8 +265,8 @@ def main():
         print(predictions)
 
         if showHelp == True:
-            cv2.putText(displayBuf, helpText, (11,20), font, 1.0, (32,32,32), 4, cv2.LINE_AA)
-            cv2.putText(displayBuf, helpText, (10,20), font, 1.0, (240,240,240), 1, cv2.LINE_AA)
+            cv2.putText(raw_frame, helpText, (11,20), font, 1.0, (32,32,32), 4, cv2.LINE_AA)
+            cv2.putText(raw_frame, helpText, (10,20), font, 1.0, (240,240,240), 1, cv2.LINE_AA)
 
         # show image
         cv2.imshow('Video', frame)
@@ -290,9 +289,9 @@ def main():
         # write raw frame to video stream
         video_writer.write(raw_frame)
 
-        if cv2.getWindowProperty(windowName, 0) < 0: # Check to see if the user closed the window
+#        if cv2.getWindowProperty(windowName, 0) < 0: # Check to see if the user closed the window
             # This will fail if the user closed the window; Nasties get printed to the console
-            break;
+#            break;
         key = cv2.waitKey(1) & 0xFF
         if key == ord('H') or key == ord('h'): # toggle help message
             showHelp = not showHelp
