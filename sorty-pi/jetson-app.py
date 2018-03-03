@@ -8,9 +8,9 @@ import numpy as np
 import tensorflow as tf
 import serial
 import json
-from jetsoncam import *
+from app.utils import FPS, VideoStream
 from datetime import datetime
-from imutils.video import FPS, VideoStream
+#from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
@@ -106,6 +106,13 @@ def readSerial(ser, term):
 
 def user_args():
     ap = argparse.ArgumentParser()
+    # use Jetson on-board camera?
+    ap.add_argument(
+        "-j",
+        "--jetson",
+        dest="use_jetsoncam",
+        help="use Jetson on-board camera",
+        action="store_true")
     # video source
     ap.add_argument(
         '-src',
@@ -113,7 +120,25 @@ def user_args():
         dest='video_source',
         type=int,
         default=0,
-        help='Device index of the camera.'
+        help='Device index # of USB webcam (/dev/video?) [0]'
+    )
+    # video width
+    ap.add_argument(
+        '-wd',
+        '--width',
+        dest='width',
+        type=int,
+        default=1280,
+        help='Width of the frames in the video stream. [1280]'
+    )
+    # video height
+    ap.add_argument(
+        '-ht',
+        '--height',
+        dest='height',
+        type=int,
+        default=720,
+        help='Height of the frames in the video stream. [720]'
     )
     # frame rate
     ap.add_argument(
@@ -123,7 +148,7 @@ def user_args():
         default=4,
         help="Framerate of video stream."
     )
-    # use pi camara?
+    # use pi camera?
     ap.add_argument(
         "-p",
         "--picamera",
@@ -131,43 +156,41 @@ def user_args():
         default=-1,
         help="whether or not the Raspberry Pi camera should be used"
     )
-
-    """
-    Parse input arguments - Jetson camera
-    """
-    ap.add_argument("--rtsp", dest="use_rtsp",
-                        help="use IP CAM (remember to also set --uri)",
-                        action="store_true")
-    ap.add_argument("--uri", dest="rtsp_uri",
-                        help="RTSP URI string, e.g. rtsp://192.168.1.64:554",
-                        default=None, type=str)
-    ap.add_argument("--latency", dest="rtsp_latency",
-                        help="latency in ms for RTSP [200]",
-                        default=200, type=int)
-    ap.add_argument("--usb", dest="use_usb",
-                        help="use USB webcam (remember to also set --vid)",
-                        action="store_true")
-    ap.add_argument("--vid", dest="video_dev",
-                        help="video device # of USB webcam (/dev/video?) [1]",
-                        default=1, type=int)
-    ap.add_argument("--width",dest="image_width",
-                        help="image width [1280]",
-                        default=1280, type=int)
-    ap.add_argument("--height", dest="image_height",
-                        help="image width [720]",
-                        default=720, type=int)
+    # use RTSP video feed?
+    ap.add_argument(
+        "--rtsp",
+        dest="use_rtsp",
+        help="use IP CAM (remember to also set --uri)",
+        action="store_true")
+    # RTSP link
+    ap.add_argument(
+        "--uri",
+        dest="rtsp_uri",
+        help="RTSP URI string, e.g. rtsp://192.168.1.64:554",
+        default=None, type=str)
+    # latency for RTPS
+    ap.add_argument(
+        "--latency",
+        dest="rtsp_latency",
+        help="latency in ms for RTSP [200]",
+        default=200, type=int)
 
     return ap.parse_args()
 
 
 def main():
+    print("Called with args:")
+    print(args)
     print("OpenCV version: {}".format(cv2.__version__))
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
     print(ser.name)  # check which port was really used
+
     # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
+
     # get user args
     args = user_args()
+
     # load tensorflow graph
     detection_graph = tf.Graph()
     with detection_graph.as_default():
@@ -178,6 +201,7 @@ def main():
             tf.import_graph_def(od_graph_def, name='')
         # initialize tf session
         sess = tf.Session(graph=detection_graph)
+
     # start video stream
     video_capture = VideoStream(
         usePiCamera=args.picamera > 0,
@@ -186,9 +210,12 @@ def main():
         use_rtsp=args.use_rtsp,
         rtsp_uri=args.rtsp_uri,
         rtsp_latency=args.rtsp_latency,
-        use_usb=args.use_usb,
-        video_dev=args.video_dev
+        use_jetsoncam=args.use_jetsoncam,
+        src=args.video_source
     ).start()
+    if not video_capture.isOpened():
+        sys.exit("Failed to open camera!")
+
     # set up video writer format
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # set up video writer
@@ -197,7 +224,11 @@ def main():
     time.sleep(2.0)
     # start frames per second timer
     fps = FPS().start()
-    # while fps._numFrames < 120
+
+    showHelp = True
+    showFullScreen = False
+    helpText = "'Esc' or 'Q' to Quit, 'H' to Toggle Help, 'F' to Toggle Fullscreen"
+
     while True:
         # read Arduino PIR sensor state
         status = ser.readline().decode('utf-8').strip("\r\n")
@@ -233,8 +264,14 @@ def main():
         # serialize output
         predictions = serialize(raw_output)
         print(predictions)
+
+        if showHelp == True:
+            cv2.putText(displayBuf, helpText, (11,20), font, 1.0, (32,32,32), 4, cv2.LINE_AA)
+            cv2.putText(displayBuf, helpText, (10,20), font, 1.0, (240,240,240), 1, cv2.LINE_AA)
+
         # show image
         cv2.imshow('Video', frame)
+
         if predictions and status == 'still':
             print(status)
             class_prediction = str(predictions[0]['class']).encode()
@@ -252,9 +289,23 @@ def main():
         fps.update()
         # write raw frame to video stream
         video_writer.write(raw_frame)
+
+        if cv2.getWindowProperty(windowName, 0) < 0: # Check to see if the user closed the window
+            # This will fail if the user closed the window; Nasties get printed to the console
+            break;
         key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
+        if key == ord('H') or key == ord('h'): # toggle help message
+            showHelp = not showHelp
+        elif key == ord('F') or key == ord('f'): # toggle fullscreen
+            showFullScreen = not showFullScreen
+            if showFullScreen == True:
+                cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            else:
+                cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+        elif key == ord('q') or key == ord('Q') or key == 27: # ESC or q key to quit program
             break
+
+
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))

@@ -10,7 +10,7 @@ def open_cam_usb(dev, width, height):
     gst_str = ("v4l2src device=/dev/video{} ! "
                "video/x-raw, width=(int){}, height=(int){}, format=(string)RGB ! "
                "videoconvert ! appsink").format(dev, width, height)
-    return cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
+    return cv2.VidpeoCapture(gst_str, cv2.CAP_GSTREAMER)
 
 def open_cam_onboard(width, height):
     # On versions of L4T previous to L4T 28.1, flip-method=2

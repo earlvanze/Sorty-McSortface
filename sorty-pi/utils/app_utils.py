@@ -6,7 +6,7 @@
 import struct
 import six
 import collections
-from Clarifai import cv2
+import cv2
 import datetime
 from threading import Thread
 from matplotlib import colors
@@ -80,14 +80,22 @@ class WebcamVideoStream:
         # indicate that the thread should be stopped
         self.stopped = True
 
+    def open_cam_usb(dev, width, height):
+        # We want to set width and height here, otherwise we could just do:
+        #     return cv2.VideoCapture(dev)
+        gst_str = ("v4l2src device=/dev/video{} ! "
+                   "video/x-raw, width=(int){}, height=(int){}, format=(string)RGB ! "
+                   "videoconvert ! appsink").format(dev, width, height)
+        return cv2.VidpeoCapture(gst_str, cv2.CAP_GSTREAMER)
 
-# Unifying picamera and cv2.VideoCapture into a single class with OpenCVPython
+
+# Unifying picamera, Jetson camera, and cv2.VideoCapture into a single class with OpenCVPython
 class VideoStream:
-    def __init__(self, src=0, usePiCamera=False, resolution=(640, 480),
+    def __init__(self, src=0, usePiCamera=False, resolution=(1280, 720),
         framerate=32):
         # check to see if the picamera module should be used
         if usePiCamera:
-            # only import the picamera packages unless we are
+            # only import the picamera packages if we are
             # explicity told to do so -- this helps remove the
             # requirement of `picamera[array]` from desktops or
             # laptops that still want to use the `imutils` package
@@ -97,10 +105,18 @@ class VideoStream:
             # sensor to warmup
             self.stream = PiVideoStream(resolution=resolution,
                 framerate=framerate)
- 
-        # otherwise, we are using OpenCV so initialize the webcam
-        # stream
-        else:
+
+        # check to see if the Jetson camera module should be used
+        elif use_jetsoncam:
+
+
+            # initialize the jetson camera stream and allow the camera
+            # sensor to warmup
+            self.stream = JetsonVideoStream(resolution=resolution,
+                framerate=framerate)
+
+        # otherwise, we are using OpenCV so initialize the webcam stream
+        if use_usb:
             self.stream = WebcamVideoStream(src=src)
 
     def start(self):
@@ -120,8 +136,54 @@ class VideoStream:
         self.stream.stop()
 
 
+class JetsonVideoStream:
+    def __init__(self, resolution=(1280, 720), framerate=32):
+        # initialize the video camera stream and read the first frame
+        # from the stream
+        gst_str = ("nvcamerasrc ! "
+                   "video/x-raw(memory:NVMM), width=(int)2592, height=(int)1458, format=(string)I420, framerate=(fraction)30/1 ! "
+                   "nvvidconv ! video/x-raw, width=(int){}, height=(int){}, format=(string)BGRx ! "
+                   "videoconvert ! appsink").format(width, height)
+        self.stream = cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
+        (self.grabbed, self.frame) = self.stream.read()
+
+        # initialize the frame and the variable used to indicate
+        # if the thread should be stopped
+        self.frame = None
+        self.stopped = False
+
+    def start(self):
+        # start the thread to read frames from the video stream
+        Thread(target=self.update, args=()).start()
+        return self
+
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        for f in self.stream:
+            # grab the frame from the stream and clear the stream in
+            # preparation for the next frame
+            self.frame = f.array
+            self.rawCapture.truncate(0)
+
+            # if the thread indicator variable is set, stop the thread
+            # and resource camera resources
+            if self.stopped:
+                self.stream.close()
+                self.rawCapture.close()
+                self.camera.close()
+                return
+
+    def read(self):
+        # return the frame most recently read
+        return self.frame
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
+
+
 class PiVideoStream:
-    def __init__(self, resolution=(640, 480), framerate=32):
+    def __init__(self, resolution=(1280, 720), framerate=32):
         # initialize the camera and stream
         self.camera = PiCamera()
         self.camera.resolution = resolution
