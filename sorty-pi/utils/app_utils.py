@@ -84,7 +84,7 @@ class WebcamVideoStream:
         gst_str = ("v4l2src device=/dev/video{} ! "
                    "video/x-raw, width=(int){}, height=(int){}, format=(string)RGB ! "
                    "videoconvert ! appsink").format(src, width, height)
-        return cv2.VidpeoCapture(gst_str, cv2.CAP_GSTREAMER)
+        return cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
 
 
 # Unifying picamera, Jetson camera, and cv2.VideoCapture into a single class with OpenCVPython
@@ -134,6 +134,8 @@ class VideoStream:
 
 class JetsonVideoStream:
     def __init__(self, resolution=(1280, 720), framerate=30):
+        width = resolution[0]
+        height = resolution[1]
         # initialize the video camera stream and read the first frame
         # from the stream
         gst_str = ("nvcamerasrc ! "
@@ -155,19 +157,13 @@ class JetsonVideoStream:
 
     def update(self):
         # keep looping infinitely until the thread is stopped
-        for f in self.stream:
-            # grab the frame from the stream and clear the stream in
-            # preparation for the next frame
-            self.frame = f.array
-            self.rawCapture.truncate(0)
-
+        while True:
             # if the thread indicator variable is set, stop the thread
-            # and resource camera resources
             if self.stopped:
-                self.stream.close()
-                self.rawCapture.close()
-                self.camera.close()
                 return
+
+            # otherwise, read the next frame from the stream
+            (self.grabbed, self.frame) = self.stream.read()
 
     def read(self):
         # return the frame most recently read
