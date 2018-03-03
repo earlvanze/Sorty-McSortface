@@ -14,9 +14,12 @@ from datetime import datetime
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-SERIAL_PORT = '/dev/ttyS0'
-#SERIAL_PORT = '/dev/ttyACM0'
-#SERIAL_PORT = '/dev/tty.usbmodem1421'
+from tensorflow.python.client import device_lib
+
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos if x.device_type == 'GPU']
+
 BAUD = 9600
 TOUT = 3.0
 
@@ -152,6 +155,7 @@ def user_args():
     ap.add_argument(
         "-p",
         "--picamera",
+        dest='use_picamera'
         type=int,
         default=-1,
         help="whether or not the Raspberry Pi camera should be used"
@@ -180,8 +184,6 @@ def user_args():
 
 def main():
     print("OpenCV version: {}".format(cv2.__version__))
-    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
-    print(ser.name)  # check which port was really used
 
     # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
@@ -190,10 +192,22 @@ def main():
     args = user_args()
     print("Called with args:")
     print(args)
+#    print(get_available_gpus())
+
+    if (args.use_jetsoncam):
+        SERIAL_PORT = '/dev/ttyS0'
+    elif (args.use_picamera):
+        SERIAL_PORT = '/dev/ttyACM0'
+    else:
+        SERIAL_PORT = '/dev/tty.usbmodem1421'
+
+    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+    print(ser.name)  # check which port was really used
 
     # load tensorflow graph
     detection_graph = tf.Graph()
-    with detection_graph.as_default():
+ 
+   with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
         with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
             serialized_graph = fid.read()
@@ -281,10 +295,10 @@ def main():
         elif status == "still":
             ser.write(str(4).encode())
             print("TRASH!!!!!")
-            time.sleep(2)
+#            time.sleep(2)
         else:
             print("Waiting for something....")
-            time.sleep(2)
+#            time.sleep(2)
         fps.update()
         # write raw frame to video stream
         video_writer.write(raw_frame)
