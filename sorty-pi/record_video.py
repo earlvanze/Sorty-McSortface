@@ -11,9 +11,9 @@ camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(1920, 1080))
 
 # set up video writer format
-fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+fourcc = cv2.VideoWriter_fourcc('m', 'j', 'p', 'g')
 # set up video writer
-video_writer = cv2.VideoWriter('recording.m4v', fourcc, 30.0, (1280, 720))
+video_writer = cv2.VideoWriter('recording.avi', fourcc, 10.0, (1920, 1080))
  
 # allow the camera to warmup
 time.sleep(0.1)
