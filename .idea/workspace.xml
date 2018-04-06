@@ -3,6 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="009ef113-73ee-49ad-8c19-4f903f3bef9a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/grbl/circle.gcode" afterPath="$PROJECT_DIR$/grbl/circle.gcode" />
+      <change beforePath="$PROJECT_DIR$/grbl/grbl.py" afterPath="$PROJECT_DIR$/grbl/grbl.py" />
+      <change beforePath="$PROJECT_DIR$/grbl/line.gcode" afterPath="$PROJECT_DIR$/grbl/line.gcode" />
+      <change beforePath="$PROJECT_DIR$/sorty-pi/app.py" afterPath="$PROJECT_DIR$/sorty-pi/app.py" />
+      <change beforePath="$PROJECT_DIR$/sorty-pi/jetson-app.py" afterPath="$PROJECT_DIR$/sorty-pi/jetson-app.py" />
+      <change beforePath="$PROJECT_DIR$/sorty-pi/sample.log" afterPath="$PROJECT_DIR$/sorty-pi/sample.log" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,11 +21,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.42356688">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="run.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sorty-pi/run.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="105">
-                  <caret line="7" column="29" lean-forward="false" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="29" />
+                <state relative-caret-position="135">
+                  <caret line="9" column="27" lean-forward="false" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
                   <folding />
                 </state>
               </provider>
@@ -35,11 +41,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="app_utils.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="app_utils.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sorty-pi/utils/app_utils.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="484">
-                  <caret line="160" column="32" lean-forward="true" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
+                <state relative-caret-position="2310">
+                  <caret line="160" column="32" lean-forward="false" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
                   <folding>
                     <element signature="e#420#433#0" expanded="true" />
                   </folding>
@@ -88,11 +94,21 @@
           <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sorty-pi/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1800">
-                  <caret line="133" column="16" lean-forward="false" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
+                <state relative-caret-position="3180">
+                  <caret line="226" column="32" lean-forward="false" selection-start-line="226" selection-start-column="32" selection-end-line="226" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="convert_bbox_to_gcode.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/sorty-pi/convert_bbox_to_gcode.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="255">
+                  <caret line="17" column="4" lean-forward="false" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -112,18 +128,18 @@
           <file leaf-file-name="jetsonvideostream.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sorty-pi/jetsonvideostream.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="150">
-                  <caret line="10" column="50" lean-forward="false" selection-start-line="10" selection-start-column="50" selection-end-line="10" selection-end-column="50" />
+                <state relative-caret-position="0">
+                  <caret line="0" column="47" lean-forward="false" selection-start-line="0" selection-start-column="47" selection-end-line="0" selection-end-column="47" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="jetson-app.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="jetson-app.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sorty-pi/jetson-app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3855">
-                  <caret line="271" column="30" lean-forward="false" selection-start-line="271" selection-start-column="30" selection-end-line="271" selection-end-column="30" />
+                <state relative-caret-position="318">
+                  <caret line="207" column="29" lean-forward="true" selection-start-line="207" selection-start-column="29" selection-end-line="207" selection-end-column="29" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
@@ -134,30 +150,20 @@
           <file leaf-file-name="grbl.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/grbl/grbl.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="203">
-                  <caret line="27" column="13" lean-forward="true" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+                <state relative-caret-position="375">
+                  <caret line="25" column="48" lean-forward="false" selection-start-line="25" selection-start-column="48" selection-end-line="25" selection-end-column="48" />
                   <folding>
-                    <element signature="e#1635#1648#0" expanded="true" />
+                    <element signature="e#1637#1650#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="circle.gcode" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/grbl/circle.gcode">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="45">
-                  <caret line="3" column="6" lean-forward="true" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="line.gcode" pinned="false" current-in-tab="true">
+          <file leaf-file-name="line.gcode" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/grbl/line.gcode">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="30">
-                  <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+                <state relative-caret-position="90">
+                  <caret line="6" column="5" lean-forward="true" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
                   <folding />
                 </state>
               </provider>
@@ -190,13 +196,18 @@
       <find>still</find>
       <find>readline()</find>
       <find>ser</find>
-      <find>ser.</find>
       <find>width</find>
       <find>set</find>
       <find>write</find>
       <find>app.utils</find>
       <find>window</find>
       <find>font</find>
+      <find>ser.</find>
+      <find>Serial</find>
+      <find>readSe</find>
+      <find>ser,</find>
+      <find>readSeria</find>
+      <find>status</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -212,19 +223,21 @@
         <option value="$PROJECT_DIR$/sorty-pi/run.py" />
         <option value="$PROJECT_DIR$/sorty-pi/object_detection.py" />
         <option value="$PROJECT_DIR$/serialServo/serialServo.ino" />
-        <option value="$PROJECT_DIR$/sorty-pi/app.py" />
         <option value="$PROJECT_DIR$/sorty-pi/jetsonvideostream.py" />
         <option value="$PROJECT_DIR$/sorty-pi/utils/app_utils.py" />
         <option value="$PROJECT_DIR$/tegra-cam.py" />
-        <option value="$PROJECT_DIR$/sorty-pi/jetson-app.py" />
         <option value="$PROJECT_DIR$/grbl.py" />
+        <option value="$PROJECT_DIR$/sorty-pi/bboxToGcode.py" />
         <option value="$PROJECT_DIR$/grbl/circle.gcode" />
+        <option value="$PROJECT_DIR$/sorty-pi/jetson-app.py" />
+        <option value="$PROJECT_DIR$/sorty-pi/app.py" />
+        <option value="$PROJECT_DIR$/sorty-pi/convert_bbox_to_gcode.py" />
         <option value="$PROJECT_DIR$/grbl/grbl.py" />
         <option value="$PROJECT_DIR$/grbl/line.gcode" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="width" value="1920" />
     <option name="height" value="1200" />
   </component>
@@ -265,6 +278,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -285,6 +299,11 @@
             </path>
             <path>
               <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Sorty-McSortface" type="462c0819:PsiDirectoryNode" />
+              <item name="sorty-pi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sorty-McSortface" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
             <path>
@@ -296,7 +315,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -410,7 +428,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1200" extended-state="6" />
+    <frame x="0" y="0" width="1920" height="1200" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24270834" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -418,7 +436,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.50277776" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32994923" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32869565" sideWeight="0.49722221" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32869565" sideWeight="0.49722221" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -462,21 +480,11 @@
           <line>44</line>
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="4" />
+      <option name="time" value="6" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sorty-pi/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1800">
-          <caret line="133" column="16" lean-forward="false" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tegra-cam.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -740,14 +748,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sorty-pi/run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="29" lean-forward="false" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sortSingleItem/sortSingleItem.ino" />
     <entry file="file://$PROJECT_DIR$/serialServo/serialServo.ino">
       <provider selected="true" editor-type-id="text-editor">
@@ -785,13 +785,72 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sorty-pi/utils/app_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2310">
+          <caret line="160" column="32" lean-forward="false" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
+          <folding>
+            <element signature="e#420#433#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sorty-pi/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="27" lean-forward="false" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grbl/circle.gcode">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="9" lean-forward="true" selection-start-line="2" selection-start-column="9" selection-end-line="2" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sorty-pi/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1800">
-          <caret line="133" column="16" lean-forward="false" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
+        <state relative-caret-position="3180">
+          <caret line="226" column="32" lean-forward="false" selection-start-line="226" selection-start-column="32" selection-end-line="226" selection-end-column="32" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sorty-pi/convert_bbox_to_gcode.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="4" lean-forward="false" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grbl/grbl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="48" lean-forward="false" selection-start-line="25" selection-start-column="48" selection-end-line="25" selection-end-column="48" />
+          <folding>
+            <element signature="e#1637#1650#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grbl/line.gcode">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="5" lean-forward="true" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sorty-pi/jetsonvideostream.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="47" lean-forward="false" selection-start-line="0" selection-start-column="47" selection-end-line="0" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -805,57 +864,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sorty-pi/jetsonvideostream.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="50" lean-forward="false" selection-start-line="10" selection-start-column="50" selection-end-line="10" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sorty-pi/jetson-app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3855">
-          <caret line="271" column="30" lean-forward="false" selection-start-line="271" selection-start-column="30" selection-end-line="271" selection-end-column="30" />
+        <state relative-caret-position="318">
+          <caret line="207" column="29" lean-forward="true" selection-start-line="207" selection-start-column="29" selection-end-line="207" selection-end-column="29" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sorty-pi/utils/app_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="160" column="32" lean-forward="true" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
-          <folding>
-            <element signature="e#420#433#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grbl/circle.gcode">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="6" lean-forward="true" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grbl/grbl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="203">
-          <caret line="27" column="13" lean-forward="true" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-          <folding>
-            <element signature="e#1635#1648#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grbl/line.gcode">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>

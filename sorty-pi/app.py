@@ -12,9 +12,10 @@ from datetime import datetime
 from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
+from convert_bbox_to_gcode import *
 
 #SERIAL_PORT = '/dev/ttyACM0'
-SERIAL_PORT = '/dev/tty.usbmodem1421'
+#SERIAL_PORT = '/dev/tty.usbmodem1421'
 BAUD = 9600
 TOUT = 3.0
 
@@ -151,8 +152,8 @@ def user_args():
 
 
 def main():
-    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
-    print(ser.name)  # check which port was really used
+#    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+#    print(ser.name)  # check which port was really used
     # start logging file
     logging.basicConfig(filename="sample.log", level=logging.INFO)
     # get user args
@@ -184,7 +185,8 @@ def main():
     # while fps._numFrames < 120
     while True:
         # read Arduino PIR sensor state
-        status = ser.readline().decode('utf-8').strip("\r\n")
+#        status = ser.readline().decode('utf-8').strip("\r\n")
+        status = "still"
         raw_frame = video_capture.read()
         t = time.time()
         # set information
@@ -220,16 +222,17 @@ def main():
         # show image
         cv2.imshow('Video', frame)
         if predictions and status == 'still':
-            print(status)
+#           print(status)
             class_prediction = str(predictions[0]['class']).encode()
-            ser.write(class_prediction)
+            convert_bbox_to_gcode(predictions)
+#            ser.write(class_prediction)
             # log results to sample.log
             logging.info(predictions)
             print(predictions)
         elif status == "still":
-            ser.write(str(4).encode())
+#            ser.write(str(4).encode())
             print("TRASH!!!!!")
-            time.sleep(2)
+#            time.sleep(2)
         else:
             print("Waiting for something....")
             time.sleep(2)
@@ -248,7 +251,7 @@ def main():
     video_writer.release()
     # destroy window
     cv2.destroyAllWindows()
-    ser.close()
+#    ser.close()
 
 
 if __name__ == '__main__':
