@@ -10,13 +10,15 @@ imutils==0.4.5
 Markdown==2.6.11
 matplotlib==2.1.2
 numpy==1.14.2
-pyserial
+opencv-python==3.4.0.12
 Pillow==5.0.0
 protobuf==3.5.1
 pyparsing==2.2.0
+pyserial==3.4
 python-dateutil==2.6.1
 pytz==2017.3
 six==1.11.0
+tensorboard==1.6.0
 tensorflow==1.6.0
 tensorflow-tensorboard==1.5.1
 termcolor==1.1.0
