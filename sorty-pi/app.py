@@ -137,7 +137,7 @@ def user_args():
         "-fr",
         "--frame_rate",
         type=int,
-        default=4,
+        default=30,
         help="Framerate of video stream."
     )
     # use pi camara?

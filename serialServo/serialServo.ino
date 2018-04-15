@@ -22,7 +22,7 @@ void setup() {
 
 void loop(){
   item = 0;
-//  Serial.println("No motion detected.");
+  Serial.println("No motion");
   if (myServo1.read() != 90) {
     myServo1.write(90);
     delay(servoDelay);

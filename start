@@ -1,5 +1,5 @@
 #!/bin/bash
 
-WDIR='/home/pi/Sorty-McSortface/sorty-pi'
+WDIR='/home/sorty/Sorty-McSortface/sorty-pi'
 
 cd $WDIR && source venv/bin/activate && python app.py -p 1
