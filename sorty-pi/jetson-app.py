@@ -21,7 +21,7 @@ def get_available_gpus():
     return [x.name for x in local_device_protos if x.device_type == 'GPU']
 
 BAUD = 9600
-TOUT = 3.0
+TOUT = 0.2
 
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
@@ -198,7 +198,8 @@ def main():
     elif (args.picamera):
         SERIAL_PORT = '/dev/ttyACM0'
     else:
-        SERIAL_PORT = '/dev/tty.usbmodem1421'
+#        SERIAL_PORT = '/dev/tty.usbmodem1421' // mac
+        SERIAL_PORT = '/dev/ttyACM0'
 
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
     print(ser.name)  # check which port was really used
@@ -227,9 +228,9 @@ def main():
     ).start()
 
     # set up video writer format
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    fourcc = cv2.VideoWriter_fourcc('F','M', 'P', '4')
     # set up video writer
-    video_writer = cv2.VideoWriter('output.m4v', fourcc, args.frame_rate, (args.width, args.height))
+    video_writer = cv2.VideoWriter('output.avi', fourcc, args.frame_rate, (args.width, args.height))
     # sleep for 2 seconds...
     time.sleep(2.0)
     # start frames per second timer
@@ -266,39 +267,50 @@ def main():
             raw_frame,
             cv2.COLOR_RGB2BGR
         )
-        # get img and raw output
-        frame, raw_output = detect_objects(
-            rgb_frame,
-            sess,
-            detection_graph
-        )
-        # serialize output
-        predictions = serialize(raw_output)
-        print(predictions)
 
         if showHelp == True:
-            cv2.putText(raw_frame, helpText, (11,20), font, 1.0, (32,32,32), 4, cv2.LINE_AA)
-            cv2.putText(raw_frame, helpText, (10,20), font, 1.0, (240,240,240), 1, cv2.LINE_AA)
+            cv2.putText(raw_frame, helpText, (11, 20), font, 1.0, (32, 32, 32), 4, cv2.LINE_AA)
+            cv2.putText(raw_frame, helpText, (10, 20), font, 1.0, (240, 240, 240), 1, cv2.LINE_AA)
 
-        # show image
-        cv2.imshow('Video', frame)
-
-        if predictions and status == 'still':
-            print(status)
-            class_prediction = str(predictions[0]['class']).encode()
-            ser.write(class_prediction)
-            # log results to sample.log
-            logging.info(predictions)
+        if status == 'still':
+            # get img and raw output
+            frame, raw_output = detect_objects(
+                rgb_frame,
+                sess,
+                detection_graph
+            )
+            # serialize output
+            predictions = serialize(raw_output)
             print(predictions)
-        elif status == "still":
-            ser.write(str(4).encode())
-            print("TRASH!!!!!")
-#            time.sleep(2)
-        else:
-            print("Waiting for something....")
-#            time.sleep(2)
+
+            if predictions:
+                print(status)
+                class_prediction = str(predictions[0]['class']).encode()
+                ser.write(class_prediction)
+                # log results to sample.log
+                logging.info(predictions)
+                print(predictions)
+            else:
+                ser.write(str(4).encode())
+                print("No recyclables detected. Probably trash.")
+    #            time.sleep(2)
+            
+            # transform image back to BGR so it looks good on display
+            bgr_frame = cv2.cvtColor(
+                frame,
+                cv2.COLOR_BGR2RGB
+            )
+            # show image
+            cv2.imshow('Video', frame)
+
+        elif status == 'No motion':
+#            print("Waiting for something....")
+            cv2.imshow('Video', raw_frame)
+#           time.sleep(2))
+
         fps.update()
-        # write raw frame to video stream
+
+        # write frame to video stream
         video_writer.write(raw_frame)
 
 #        if cv2.getWindowProperty(windowName, 0) < 0: # Check to see if the user closed the window
@@ -313,7 +325,7 @@ def main():
                 cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
             else:
                 cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
-        elif key == ord('q') or key == ord('Q') or key == 27: # ESC or q key to quit program
+        elif key == ord('Q') or key == ord('q') or key == 27: # ESC or q key to quit program
             break
 
 

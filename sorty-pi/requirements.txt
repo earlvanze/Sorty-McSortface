@@ -9,13 +9,15 @@ html5lib==0.9999999
 imutils==0.4.5
 Markdown==2.6.11
 matplotlib==2.1.2
-numpy==1.14.0
+numpy==1.14.2
+pyserial
 Pillow==5.0.0
 protobuf==3.5.1
 pyparsing==2.2.0
 python-dateutil==2.6.1
 pytz==2017.3
 six==1.11.0
+tensorflow==1.6.0
 tensorflow-tensorboard==1.5.1
 termcolor==1.1.0
 Werkzeug==0.14.1
