@@ -137,7 +137,7 @@ def user_args():
         "-fr",
         "--frame_rate",
         type=int,
-        default=4,
+        default=30,
         help="Framerate of video stream."
     )
     # use pi camara?
@@ -175,9 +175,9 @@ def main():
         framerate=args.frame_rate
     ).start()
     # set up video writer format
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+#    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # set up video writer
-    video_writer = cv2.VideoWriter('output.m4v', fourcc, 30.0, (1280, 720))
+#    video_writer = cv2.VideoWriter('output.m4v', fourcc, 30.0, (1280, 720))
     # sleep for 2 seconds...
     time.sleep(2.0)
     # start frames per second timer
@@ -238,7 +238,7 @@ def main():
             time.sleep(2)
         fps.update()
         # write raw frame to video stream
-        video_writer.write(raw_frame)
+#        video_writer.write(raw_frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
@@ -248,7 +248,7 @@ def main():
     # stop video
     video_capture.stop()
     # release video stream
-    video_writer.release()
+#    video_writer.release()
     # destroy window
     cv2.destroyAllWindows()
 #    ser.close()

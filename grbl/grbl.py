@@ -33,7 +33,8 @@ import serial
 import time
 
 # Open grbl serial port
-s = serial.Serial('/dev/tty.usbmodem1421',115200)
+s = serial.Serial('/dev/tty.usbmodem1411',115200)
+s2 = serial.Serial('/dev/tty.usbmodem1421',9600)
 
 # Open g-code file
 f = open('line.gcode','r');
@@ -51,6 +52,9 @@ for line in f:
     s.write(l + '\n') # Send g-code block to grbl
     grbl_out = s.readline() # Wait for grbl response with carriage return
     print ' : ' + grbl_out.strip()
+
+s2.write(str(4).encode())
+time.sleep(2)
 
 # Wait here until grbl is finished to close serial port and file.
 #raw_input("  Press <Enter> to exit and disable grbl.")

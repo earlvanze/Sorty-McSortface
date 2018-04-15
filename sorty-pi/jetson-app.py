@@ -70,7 +70,7 @@ def detect_objects(image_np, sess, detection_graph):
     # Visualization of the results of a detection.
     vis_util.visualize_boxes_and_labels_on_image_array(
         image_np,
-        output_dict['detection_boxes'q],
+        output_dict['detection_boxes'],
         output_dict['detection_classes'],
         output_dict['detection_scores'],
         category_index,
@@ -156,7 +156,7 @@ def user_args():
         "-p",
         "--picamera",
         type=int,
-        default=-1,
+        default=0,
         help="whether or not the Raspberry Pi camera should be used"
     )
     # use RTSP video feed?
