@@ -14,6 +14,7 @@ from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 from convert_bbox_to_gcode import *
+from utils import cloud
 
 BAUD = 9600
 TOUT = 3.0
@@ -27,8 +28,8 @@ NUM_CLASSES = 90
 BUCKET_NAME = 'sorty-logs'
 
 session = boto3.Session(
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    aws_access_key_id='AWS_ACCESS_KEY_ID',
+    aws_secret_access_key='AWS_SECRET_ACCESS_KEY',
 )
 
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
@@ -202,7 +203,7 @@ def main():
             logging.info(predictions)
             print(predictions)
         elif status == "still":
-            print("TRASH!!!!!")
+            print(datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f'))
         else:
             print("Waiting for something....")
             time.sleep(2)
