@@ -13,6 +13,7 @@ from datetime import datetime
 #from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
+from convert_bbox_to_gcode import convert_bbox_to_gcode
 
 from tensorflow.python.client import device_lib
 
@@ -22,6 +23,7 @@ def get_available_gpus():
 
 BAUD = 9600
 TOUT = 0.2
+GRBL_BAUD = 115200
 
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
@@ -177,8 +179,57 @@ def user_args():
         dest="rtsp_latency",
         help="latency in ms for RTSP [200]",
         default=200, type=int)
+    # disable serial for testing
+    ap.add_argument(
+        "-d",
+        "--debian",
+        dest="debian",
+        help="use Debian-based OS",
+        action="store_true")
+    # disable serial for testing
+    ap.add_argument(
+        "--noserial",
+        dest="no_serial",
+        help="disable serial for testing without Arduinos",
+        action="store_true")
 
     return ap.parse_args()
+
+
+def move_motors(gcode):
+    """
+    Simple g-code streaming script for grbl
+    Provided as an illustration of the basic communication interface
+    for grbl. When grbl has finished parsing the g-code block, it will
+    return an 'ok' or 'error' response. When the planner buffer is full,
+    grbl will not send a response until the planner buffer clears space.
+    G02/03 arcs are special exceptions, where they inject short line
+    segments directly into the planner. So there may not be a response
+    from grbl for the duration of the arc.
+    """
+    # Wake up grbl
+    ser_grbl.write("\r\n\r\n")
+    time.sleep(2)  # Wait for grbl to initialize
+    ser_grbl.flushInput()  # Flush startup text in serial input
+
+    # Stream g-code to grbl
+    for line in gcode:
+        l = line.strip()  # Strip all EOL characters for consistency
+        print ('Sending: ' + l)
+        ser_grbl.write(l + '\n')  # Send g-code block to grbl
+        grbl_out = ser_grbl.readline()  # Wait for grbl response with carriage return
+        print (' : ' + grbl_out.strip())
+
+    # send trash command to 2nd Arduino to flip servo motor platform and dump trash
+    ser.write(str(4).encode())
+
+    time.sleep(2)
+
+    # Wait here until grbl is finished to close serial port and file.
+    # raw_input("  Press <Enter> to exit and disable grbl.")
+
+    # Close serial port
+    ser_grbl.close()
 
 
 def main():
@@ -195,14 +246,21 @@ def main():
 
     if (args.use_jetsoncam):
         SERIAL_PORT = '/dev/ttyS0'
-    elif (args.picamera):
+        GRBL_PORT = '/dev/ttyS1'
+    elif (args.picamera or args.debian):
         SERIAL_PORT = '/dev/ttyACM0'
+        GRBL_PORT = '/dev/ttyACM1'
     else:
-#        SERIAL_PORT = '/dev/tty.usbmodem1421' // mac
-        SERIAL_PORT = '/dev/ttyACM0'
+        # MacOS
+        SERIAL_PORT = '/dev/tty.usbmodem1421'
+        GRBL_PORT = '/dev/tty.usbmodem1411'
 
-    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
-    print(ser.name)  # check which port was really used
+    if not args.no_serial:
+        ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+        print(ser.name)  # check which port was really used
+
+        ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
+        print(ser_grbl.name)  # check which port was really used
 
     # load tensorflow graph
     detection_graph = tf.Graph() 
@@ -228,7 +286,7 @@ def main():
     ).start()
 
     # set up video writer format
-    fourcc = cv2.VideoWriter_fourcc('F','M', 'P', '4')
+    fourcc = cv2.VideoWriter_fourcc('M', 'P', '4', 'V')
     # set up video writer
     video_writer = cv2.VideoWriter('output.avi', fourcc, args.frame_rate, (args.width, args.height))
     # sleep for 2 seconds...
@@ -243,7 +301,10 @@ def main():
 
     while True:
         # read Arduino PIR sensor state
-        status = ser.readline().decode('utf-8').strip("\r\n")
+        if not args.no_serial:
+            status = ser.readline().decode('utf-8').strip("\r\n")
+        else:
+            status = "still"
         raw_frame = video_capture.read()
         t = time.time()
         # set information
@@ -286,13 +347,19 @@ def main():
             if predictions:
                 print(status)
                 class_prediction = str(predictions[0]['class']).encode()
-                ser.write(class_prediction)
+                if not args.no_serial:
+                    ser.write(class_prediction)
                 # log results to sample.log
                 logging.info(predictions)
                 print(predictions)
+                gcode = convert_bbox_to_gcode(predictions)
+                print(gcode)
+                if not args.no_serial:
+                    move_motors(gcode)
             else:
-                ser.write(str(4).encode())
                 print("No recyclables detected. Probably trash.")
+                if not args.no_serial:
+                    ser.write(str(4).encode())
     #            time.sleep(2)
             
             # transform image back to BGR so it looks good on display
@@ -338,7 +405,8 @@ def main():
     video_writer.release()
     # destroy window
     cv2.destroyAllWindows()
-    ser.close()
+    if not args.no_serial:
+        ser.close()
 
 
 if __name__ == '__main__':
