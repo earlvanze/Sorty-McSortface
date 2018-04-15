@@ -368,7 +368,7 @@ def main():
                 cv2.COLOR_BGR2RGB
             )
             # show image
-            cv2.imshow('Video', frame)
+            cv2.imshow('Video', bgr_frame)
 
         elif status == 'No motion':
 #            print("Waiting for something....")
