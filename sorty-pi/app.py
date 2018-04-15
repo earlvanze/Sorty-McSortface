@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 import serial
 import json
+import boto3
 from datetime import datetime
 from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
@@ -23,7 +24,12 @@ LABELS = 'model/object-detection.pbtxt'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 PATH_TO_LABELS = os.path.join(CWD_PATH, LABELS)
 NUM_CLASSES = 90
+BUCKET_NAME = 'sorty-logs'
 
+session = boto3.Session(
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+)
 
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(
@@ -184,6 +190,11 @@ def main():
             detection_graph
         )
         predictions = serialize(raw_output)
+        # Save predictions to S3
+        if len(predictions) > 0:
+            ts = datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
+            outpath = f"{ts}.json"
+            cloud.write_to_S3(session, predictions, BUCKET_NAME, outpath)
         cv2.imshow('Video', frame)
         if predictions and status == 'still':
             class_prediction = str(predictions[0]['class']).encode()
