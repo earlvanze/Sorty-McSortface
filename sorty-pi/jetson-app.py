@@ -196,7 +196,7 @@ def user_args():
     return ap.parse_args()
 
 
-def move_motors(gcode):
+def move_motors(gcode, ser_grbl):
     """
     Simple g-code streaming script for grbl
     Provided as an illustration of the basic communication interface
@@ -208,7 +208,7 @@ def move_motors(gcode):
     from grbl for the duration of the arc.
     """
     # Wake up grbl
-    ser_grbl.write("\r\n\r\n")
+    ser_grbl.write("\r\n\r\n".encode())
     time.sleep(2)  # Wait for grbl to initialize
     ser_grbl.flushInput()  # Flush startup text in serial input
 
@@ -216,7 +216,7 @@ def move_motors(gcode):
     for line in gcode:
         l = line.strip()  # Strip all EOL characters for consistency
         print ('Sending: ' + l)
-        ser_grbl.write(l + '\n')  # Send g-code block to grbl
+        ser_grbl.write(l + '\n'.encode())  # Send g-code block to grbl
         grbl_out = ser_grbl.readline()  # Wait for grbl response with carriage return
         print (' : ' + grbl_out.strip())
 
@@ -244,16 +244,19 @@ def main():
     print(args)
 #    print(get_available_gpus())
 
+    GRBL_PORT = '/dev/ttyACM0'
+    SERIAL_PORT = '/dev/ttyACM1'
+
     if (args.use_jetsoncam):
-        SERIAL_PORT = '/dev/ttyS0'
-        GRBL_PORT = '/dev/ttyS1'
+        GRBL_PORT = '/dev/ttyS0'
+        SERIAL_PORT = '/dev/ttyS1'
     elif (args.picamera or args.debian):
-        SERIAL_PORT = '/dev/ttyACM0'
-        GRBL_PORT = '/dev/ttyACM1'
+        GRNL_PORT = '/dev/ttyACM0'
+        SERIAL_PORT = '/dev/ttyACM1'
     else:
         # MacOS
-        SERIAL_PORT = '/dev/tty.usbmodem1421'
-        GRBL_PORT = '/dev/tty.usbmodem1411'
+        GRBL_PORT = '/dev/tty.usbmodem1421'
+        SERIAL_PORT = '/dev/tty.usbmodem1411'
 
     if not args.no_serial:
         ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
@@ -355,7 +358,7 @@ def main():
                 gcode = convert_bbox_to_gcode(predictions)
                 print(gcode)
                 if not args.no_serial:
-                    move_motors(gcode)
+                    move_motors(gcode, ser_grbl)
             else:
                 print("No recyclables detected. Probably trash.")
                 if not args.no_serial:
