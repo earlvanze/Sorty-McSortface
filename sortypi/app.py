@@ -46,7 +46,7 @@ def set_ports(args):
     return GRBL_PORT, SERIAL_PORT
 
 
-def set_status(ser, args):
+def get_status(ser, args):
     if not args.no_serial:
         status = ser.readline().decode('utf-8').strip("\r\n")
         return status
@@ -88,7 +88,7 @@ def main():
 
     while True:
         # read Arduino PIR sensor state
-        status = set_status(ser, args)
+        status = get_status(ser, args)
         raw_frame = video_capture.read()
         rgb_frame = cv2.cvtColor(raw_frame, cv2.COLOR_RGB2BGR)
 
@@ -105,8 +105,8 @@ def main():
                 write_to_S3(aws, predictions, "sorty-logs", fname)
                 gcode = convert_bbox_to_gcode(predictions)
                 print(f"{status} \n {gcode}")
-                if not args.no_serial:
-                    move_motors(gcode, ser_grbl)
+#                if not args.no_serial:
+#                    move_motors(gcode, ser_grbl)
             else:
                 print("No recyclables detected. Probably trash.")
                 if not args.no_serial:

@@ -24,7 +24,7 @@ const int stepsPerRevolution = 200;  // change this to fit the number of steps p
 Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
 
 int item; // variable to store bin selection
-int servoPin = 12; //declare pin for the servo
+int servoPin = 3; //declare pin for the servo
 int servoDelay = 800; //delay to allow the servo to reach position;
 int val = 0;
 int sensorPin = 2;
@@ -103,13 +103,13 @@ void loop(){
   } else {
     digitalWrite(ledPin, LOW); // turn LED OFF
     if (pirState == HIGH){
-      // we have just turned off
-      // We only want to print on the output change, not state
-      pirState = LOW;
       if (doorOpened) {
         closeDoor();
       }
+      // we have just turned off
       Serial.println("still");
+      // We only want to print on the output change, not state
+      pirState = LOW;
     }
     if (Serial.available() > 0){ //wait until information is received from the serial port
       item = 0;
