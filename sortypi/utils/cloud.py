@@ -1,4 +1,5 @@
 import json
+import boto3
 
 
 def serialize_json_for_s3(data):
@@ -21,3 +22,11 @@ def write_to_S3(session, data, bucket, path):
     s3 = session.resource('s3')
     obj = s3.Object(bucket, path)
     obj.put(Body=json.dumps(output))
+
+
+def connect_to_aws():
+    sess = boto3.Session(
+        aws_access_key_id='AWS_ACCESS_KEY_ID',
+        aws_secret_access_key='AWS_SECRET_ACCESS_KEY',
+    )
+    return sess

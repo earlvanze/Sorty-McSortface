@@ -4,7 +4,7 @@ import time
 import serial
 import boto3
 import tensorflow as tf
-from utils.cloud import write_to_S3
+from utils.cloud import write_to_S3, connect_to_aws
 from inference import detect_objects, serialize
 from datetime import datetime as dt
 from utils.app_utils import FPS
@@ -18,12 +18,6 @@ GRBL_BAUD = 115200
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
-
-
-aws = boto3.Session(
-    aws_access_key_id='AWS_ACCESS_KEY_ID',
-    aws_secret_access_key='AWS_SECRET_ACCESS_KEY',
-)
 
 
 def move_motors(gcode, ser_grbl):
@@ -88,6 +82,9 @@ def main():
     fps = FPS().start()
     show_help = True
     show_full_screen = False
+
+    # connect to aws S3 bucket
+    aws = connect_to_aws()
 
     while True:
         # read Arduino PIR sensor state
