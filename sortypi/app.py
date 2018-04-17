@@ -94,27 +94,9 @@ def main():
         else:
             status = "still"
         raw_frame = video_capture.read()
-        t = time.time()
-        ts_text = dt.now().strftime("%A %d %B %Y %I:%M:%S%p")
-        position = (10, raw_frame.shape[0] - 10)
-        font_face = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 0.35
-        color = (0, 0, 255)
-        # put information text in the lower bottom corner
-        cv2.putText(
-            raw_frame,
-            ts_text,
-            position,
-            font_face,
-            font_scale,
-            color,
-            1
-        )
+
         # transform image into rgb
-        rgb_frame = cv2.cvtColor(
-            raw_frame,
-            cv2.COLOR_RGB2BGR
-        )
+        rgb_frame = cv2.cvtColor(raw_frame, cv2.COLOR_RGB2BGR)
 
         if showHelp:
             cv2.putText(raw_frame, helpText, (11, 20), font,
