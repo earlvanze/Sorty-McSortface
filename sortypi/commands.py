@@ -90,6 +90,13 @@ def user_args():
         type=str,
         default='normal',
     )
+    args.add_argument(
+        "--window_name",
+        dest="window_name",
+        help="Window name",
+        type=str,
+        default='normal',
+    )
     return args.parse_args()
 
 
