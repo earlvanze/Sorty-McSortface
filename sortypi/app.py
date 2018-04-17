@@ -2,7 +2,6 @@ import os
 import cv2
 import time
 import serial
-import boto3
 import tensorflow as tf
 from utils.cloud import write_to_S3, connect_to_aws
 from inference import detect_objects, serialize
