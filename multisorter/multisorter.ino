@@ -83,7 +83,7 @@ void closeDoor() {
 
 void loop(){
   item = 0;
-  Serial.println("No motion");
+  Serial.println("ready");
   if (myServo.read() != 90) {
     myServo.write(90);
     delay(servoDelay);
@@ -104,12 +104,12 @@ void loop(){
     digitalWrite(ledPin, LOW); // turn LED OFF
     if (pirState == HIGH){
       // we have just turned off
-      Serial.println("still");
       // We only want to print on the output change, not state
       pirState = LOW;
       if (doorOpened) {
         closeDoor();
       }
+      Serial.println("still");
     }
     if (Serial.available() > 0){ //wait until information is received from the serial port
       item = 0;

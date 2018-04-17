@@ -30,9 +30,7 @@ def move_motors(gcode, ser_grbl):
         ser_grbl.write(l + '\n'.encode())
         grbl_out = ser_grbl.readline()
         print(' : ' + grbl_out.strip())
-
     time.sleep(2)
-    ser_grbl.close()
 
 
 def main():
@@ -44,7 +42,7 @@ def main():
         GRBL_PORT = '/dev/ttyS0'
         SERIAL_PORT = '/dev/ttyS1'
     elif (args.picamera or args.debian):
-        GRNL_PORT = '/dev/ttyACM0'
+        GRBL_PORT = '/dev/ttyACM0'
         SERIAL_PORT = '/dev/ttyACM1'
     else:
         # MacOS
@@ -133,9 +131,6 @@ def main():
 
             if predictions:
                 print(status)
-                class_prediction = str(predictions[0]['class']).encode()
-                if not args.no_serial:
-                    ser.write(class_prediction)
                 gcode = convert_bbox_to_gcode(predictions)
                 print(gcode)
                 if not args.no_serial:
@@ -149,10 +144,9 @@ def main():
                 frame,
                 cv2.COLOR_BGR2RGB
             )
-
             cv2.imshow('Video', bgr_frame)
 
-        elif status == 'No motion':
+        elif status == 'ready':
             cv2.imshow('Video', raw_frame)
 
         fps.update()
@@ -185,6 +179,7 @@ def main():
 
     if not args.no_serial:
         ser.close()
+        ser_grbl.close()
 
 
 if __name__ == '__main__':

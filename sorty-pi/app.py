@@ -180,7 +180,7 @@ def move_motors(gcode, ser_grbl):
 
     ser_grbl.write("\r\n\r\n")
     time.sleep(2)
-    ser_grbl.flushInput()
+    ser_grbl.flushInput(21)
 
     for line in gcode:
         l = line.strip()
