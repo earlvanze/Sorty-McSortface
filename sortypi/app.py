@@ -1,9 +1,12 @@
 import os
 import cv2
 import time
-import tensorflow as tf
 import serial
+import boto3
+import tensorflow as tf
+from utils.cloud import write_to_S3
 from inference import detect_objects, serialize
+from datetime import datetime as dt
 from utils.app_utils import FPS
 from commands import args
 from convert_bbox_to_gcode import convert_bbox_to_gcode
@@ -15,6 +18,12 @@ GRBL_BAUD = 115200
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
+
+
+aws = boto3.Session(
+    aws_access_key_id='AWS_ACCESS_KEY_ID',
+    aws_secret_access_key='AWS_SECRET_ACCESS_KEY',
+)
 
 
 def move_motors(gcode, ser_grbl):
@@ -50,12 +59,18 @@ def set_status(ser, args):
     return "still"
 
 
-def main():
-    print("OpenCV version: {}".format(cv2.__version__))
-    GRBL_PORT, SERIAL_PORT = set_ports(args)
+def set_serial(args, SERIAL_PORT, GRBL_PORT):
     if not args.no_serial:
         ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
         ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
+        return ser, ser_grbl
+    return None, None
+
+
+def main():
+    print("OpenCV version: {}".format(cv2.__version__))
+    GRBL_PORT, SERIAL_PORT = set_ports(args)
+    ser, ser_grbl = set_serial(args, SERIAL_PORT, GRBL_PORT)
 
     # load tensorflow graph
     detection_graph = tf.Graph()
@@ -86,8 +101,11 @@ def main():
         if status == 'still':
             frame, output = detect_objects(rgb_frame, sess, detection_graph)
             predictions = serialize(output)
-            print(predictions)
-            if predictions:
+            # Save predictions to S3
+            if len(predictions) > 0:
+                ts = dt.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
+                fname = f"{ts}.json"
+                write_to_S3(aws, predictions, "sorty-logs", fname)
                 gcode = convert_bbox_to_gcode(predictions)
                 print(f"{status} \n {gcode}")
                 if not args.no_serial:
