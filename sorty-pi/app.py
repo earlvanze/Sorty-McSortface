@@ -8,16 +8,22 @@ import numpy as np
 import tensorflow as tf
 import serial
 import json
-import boto3
+from utils.app_utils import FPS, VideoStream
 from datetime import datetime
-from imutils.video import FPS, VideoStream
+#from imutils.video import FPS, VideoStream
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
-from convert_bbox_to_gcode import *
-from utils import cloud
+from convert_bbox_to_gcode import convert_bbox_to_gcode
+
+from tensorflow.python.client import device_lib
+
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos if x.device_type == 'GPU']
 
 BAUD = 9600
-TOUT = 3.0
+TOUT = 0.2
+GRBL_BAUD = 115200
 
 CWD_PATH = os.getcwd()
 GRAPH_NAME = 'inference_graph/frozen_inference_graph.pb'
@@ -25,12 +31,7 @@ LABELS = 'model/object-detection.pbtxt'
 PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 PATH_TO_LABELS = os.path.join(CWD_PATH, LABELS)
 NUM_CLASSES = 90
-BUCKET_NAME = 'sorty-logs'
-
-session = boto3.Session(
-    aws_access_key_id='AWS_ACCESS_KEY_ID',
-    aws_secret_access_key='AWS_SECRET_ACCESS_KEY',
-)
+windowName = "Sorty"
 
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(
@@ -43,14 +44,22 @@ category_index = label_map_util.create_category_index(categories)
 
 
 def detect_objects(image_np, sess, detection_graph):
+    # Expand dimensions since the model expects
+    # images to have shape: [1, None, None, 3]
     image_np_expanded = np.expand_dims(image_np, axis=0)
     image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
 
+    # Each box represents a part of the image
+    # where a particular object was detected.
     boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+
+    # Each score represent how level of confidence for each of the objects.
+    # Score is shown on the result image, together with the class label.
     scores = detection_graph.get_tensor_by_name('detection_scores:0')
     classes = detection_graph.get_tensor_by_name('detection_classes:0')
     num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
+    # Actual detection.
     (boxes, scores, classes, num_detections) = sess.run(
         [boxes, scores, classes, num_detections],
         feed_dict={image_tensor: image_np_expanded}
@@ -60,6 +69,7 @@ def detect_objects(image_np, sess, detection_graph):
     output_dict['detection_classes'] = np.squeeze(classes).astype(np.int32)
     output_dict['detection_scores'] = np.squeeze(scores)
 
+    # Visualization of the results of a detection.
     vis_util.visualize_boxes_and_labels_on_image_array(
         image_np,
         output_dict['detection_boxes'],
@@ -101,30 +111,41 @@ def readSerial(ser, term):
 
 def user_args():
     ap = argparse.ArgumentParser()
+    # use Jetson on-board camera?
+    ap.add_argument(
+        "-j",
+        "--jetson",
+        dest="use_jetsoncam",
+        help="use Jetson on-board camera",
+        action="store_true")
+    # video source
     ap.add_argument(
         '-src',
         '--source',
         dest='video_source',
         type=int,
         default=0,
-        help='Device index of the camera.'
+        help='Device index # of USB webcam (/dev/video?) [0]'
     )
+    # video width
     ap.add_argument(
         '-wd',
         '--width',
         dest='width',
         type=int,
         default=1280,
-        help='Width of the frames in the video stream.'
+        help='Width of the frames in the video stream. [1280]'
     )
+    # video height
     ap.add_argument(
         '-ht',
         '--height',
         dest='height',
         type=int,
         default=720,
-        help='Height of the frames in the video stream.'
+        help='Height of the frames in the video stream. [720]'
     )
+    # frame rate
     ap.add_argument(
         "-fr",
         "--frame_rate",
@@ -132,46 +153,170 @@ def user_args():
         default=30,
         help="Framerate of video stream."
     )
+    # use pi camera?
     ap.add_argument(
         "-p",
         "--picamera",
         type=int,
-        default=-1,
+        default=0,
         help="whether or not the Raspberry Pi camera should be used"
     )
+    # use RTSP video feed?
+    ap.add_argument(
+        "--rtsp",
+        dest="use_rtsp",
+        help="use IP CAM (remember to also set --uri)",
+        action="store_true")
+    # RTSP link
+    ap.add_argument(
+        "--uri",
+        dest="rtsp_uri",
+        help="RTSP URI string, e.g. rtsp://192.168.1.64:554",
+        default=None, type=str)
+    # latency for RTPS
+    ap.add_argument(
+        "--latency",
+        dest="rtsp_latency",
+        help="latency in ms for RTSP [200]",
+        default=200, type=int)
+    # disable serial for testing
+    ap.add_argument(
+        "-d",
+        "--debian",
+        dest="debian",
+        help="use Debian-based OS",
+        action="store_true")
+    # disable serial for testing
+    ap.add_argument(
+        "--noserial",
+        dest="no_serial",
+        help="disable serial for testing without Arduinos",
+        action="store_true")
+
     return ap.parse_args()
 
 
-def main():
-    logging.basicConfig(filename="sample.log", level=logging.INFO)
-    args = user_args()
-    detection_graph = tf.Graph()
+def move_motors(gcode, ser_grbl):
+    """
+    Simple g-code streaming script for grbl
+    Provided as an illustration of the basic communication interface
+    for grbl. When grbl has finished parsing the g-code block, it will
+    return an 'ok' or 'error' response. When the planner buffer is full,
+    grbl will not send a response until the planner buffer clears space.
+    G02/03 arcs are special exceptions, where they inject short line
+    segments directly into the planner. So there may not be a response
+    from grbl for the duration of the arc.
+    """
+    # Wake up grbl
+    ser_grbl.write("\r\n\r\n".encode())
+    time.sleep(2)  # Wait for grbl to initialize
+    ser_grbl.flushInput()  # Flush startup text in serial input
 
+    # Stream g-code to grbl
+    for line in gcode:
+        l = line.strip()  # Strip all EOL characters for consistency
+        print ('Sending: ' + l)
+        ser_grbl.write(l + '\n'.encode())  # Send g-code block to grbl
+        grbl_out = ser_grbl.readline()  # Wait for grbl response with carriage return
+        print (' : ' + grbl_out.strip())
+
+    # send trash command to 2nd Arduino to flip servo motor platform and dump trash
+    ser.write(str(4).encode())
+
+    time.sleep(2)
+
+    # Wait here until grbl is finished to close serial port and file.
+    # raw_input("  Press <Enter> to exit and disable grbl.")
+
+    # Close serial port
+    ser_grbl.close()
+
+
+def main():
+    print("OpenCV version: {}".format(cv2.__version__))
+
+    # start logging file
+    logging.basicConfig(filename="sample.log", level=logging.INFO)
+
+    # get user args
+    args = user_args()
+    print("Called with args:")
+    print(args)
+#    print(get_available_gpus())
+
+    GRBL_PORT = '/dev/ttyACM0'
+    SERIAL_PORT = '/dev/ttyACM1'
+
+    if (args.use_jetsoncam):
+        GRBL_PORT = '/dev/ttyS0'
+        SERIAL_PORT = '/dev/ttyS1'
+    elif (args.picamera or args.debian):
+        GRNL_PORT = '/dev/ttyACM0'
+        SERIAL_PORT = '/dev/ttyACM1'
+    else:
+        # MacOS
+        GRBL_PORT = '/dev/tty.usbmodem1421'
+        SERIAL_PORT = '/dev/tty.usbmodem1411'
+
+    if not args.no_serial:
+        ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+        print(ser.name)  # check which port was really used
+
+        ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
+        print(ser_grbl.name)  # check which port was really used
+
+    # load tensorflow graph
+    detection_graph = tf.Graph() 
     with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
         with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
             serialized_graph = fid.read()
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
+        # initialize tf session
         sess = tf.Session(graph=detection_graph)
 
+    # start video stream
     video_capture = VideoStream(
         usePiCamera=args.picamera > 0,
         resolution=(args.width, args.height),
-        framerate=args.frame_rate
+        framerate=args.frame_rate,
+#        use_rtsp=args.use_rtsp,
+#        rtsp_uri=args.rtsp_uri,
+#        rtsp_latency=args.rtsp_latency,
+        use_jetsoncam=args.use_jetsoncam,
+        src=args.video_source
     ).start()
+
+    # set up video writer format
+    fourcc = cv2.VideoWriter_fourcc('M', 'P', '4', 'V')
+    # set up video writer
+    video_writer = cv2.VideoWriter('output.avi', fourcc, args.frame_rate, (args.width, args.height))
+    # sleep for 2 seconds...
     time.sleep(2.0)
+    # start frames per second timer
     fps = FPS().start()
 
+    showHelp = True
+    showFullScreen = False
+    helpText = "'Esc' or 'Q' to Quit, 'H' to Toggle Help, 'F' to Toggle Fullscreen"
+    font = cv2.FONT_HERSHEY_PLAIN
+
     while True:
-        status = "still"
+        # read Arduino PIR sensor state
+        if not args.no_serial:
+            status = ser.readline().decode('utf-8').strip("\r\n")
+        else:
+            status = "still"
         raw_frame = video_capture.read()
         t = time.time()
+        # set information
         ts_text = datetime.now().strftime("%A %d %B %Y %I:%M:%S%p")
         position = (10, raw_frame.shape[0] - 10)
         font_face = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 0.35
         color = (0, 0, 255)
+        # put information text in the lower bottom corner
         cv2.putText(
             raw_frame,
             ts_text,
@@ -181,41 +326,90 @@ def main():
             color,
             1
         )
+        # transform image into rgb
         rgb_frame = cv2.cvtColor(
             raw_frame,
             cv2.COLOR_RGB2BGR
         )
-        frame, raw_output = detect_objects(
-            rgb_frame,
-            sess,
-            detection_graph
-        )
-        predictions = serialize(raw_output)
-        # Save predictions to S3
-        if len(predictions) > 0:
-            ts = datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
-            outpath = f"{ts}.json"
-            cloud.write_to_S3(session, predictions, BUCKET_NAME, outpath)
-        cv2.imshow('Video', frame)
-        if predictions and status == 'still':
-            class_prediction = str(predictions[0]['class']).encode()
-            convert_bbox_to_gcode(predictions)
-            logging.info(predictions)
+
+        if showHelp == True:
+            cv2.putText(raw_frame, helpText, (11, 20), font, 1.0, (32, 32, 32), 4, cv2.LINE_AA)
+            cv2.putText(raw_frame, helpText, (10, 20), font, 1.0, (240, 240, 240), 1, cv2.LINE_AA)
+
+        if status == 'still':
+            # get img and raw output
+            frame, raw_output = detect_objects(
+                rgb_frame,
+                sess,
+                detection_graph
+            )
+            # serialize output
+            predictions = serialize(raw_output)
             print(predictions)
-        elif status == "still":
-            print(datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f'))
-        else:
-            print("Waiting for something....")
-            time.sleep(2)
+
+            if predictions:
+                print(status)
+                class_prediction = str(predictions[0]['class']).encode()
+                if not args.no_serial:
+                    ser.write(class_prediction)
+                # log results to sample.log
+                logging.info(predictions)
+                print(predictions)
+                gcode = convert_bbox_to_gcode(predictions)
+                print(gcode)
+                if not args.no_serial:
+                    move_motors(gcode, ser_grbl)
+            else:
+                print("No recyclables detected. Probably trash.")
+                if not args.no_serial:
+                    ser.write(str(4).encode())
+    #            time.sleep(2)
+            
+            # transform image back to BGR so it looks good on display
+            bgr_frame = cv2.cvtColor(
+                frame,
+                cv2.COLOR_BGR2RGB
+            )
+            # show image
+            cv2.imshow('Video', bgr_frame)
+
+        elif status == 'No motion':
+#            print("Waiting for something....")
+            cv2.imshow('Video', raw_frame)
+#           time.sleep(2))
+
         fps.update()
+
+        # write frame to video stream
+        video_writer.write(raw_frame)
+
+#        if cv2.getWindowProperty(windowName, 0) < 0: # Check to see if the user closed the window
+            # This will fail if the user closed the window; Nasties get printed to the console
+#            break;
         key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
+        if key == ord('H') or key == ord('h'): # toggle help message
+            showHelp = not showHelp
+        elif key == ord('F') or key == ord('f'): # toggle fullscreen
+            showFullScreen = not showFullScreen
+            if showFullScreen == True:
+                cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            else:
+                cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+        elif key == ord('Q') or key == ord('q') or key == 27: # ESC or q key to quit program
             break
+
+
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
+    # stop video
     video_capture.stop()
+    # release video stream
+    video_writer.release()
+    # destroy window
     cv2.destroyAllWindows()
+    if not args.no_serial:
+        ser.close()
 
 
 if __name__ == '__main__':
