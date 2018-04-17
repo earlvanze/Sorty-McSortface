@@ -69,13 +69,27 @@ def user_args():
         "--debian",
         dest="debian",
         help="use Debian-based OS",
-        action="store_true")
+        action="store_true"
+    )
     args.add_argument(
         "--noserial",
         dest="no_serial",
         help="disable serial for testing without Arduinos",
-        action="store_true")
-
+        action="store_true"
+    )
+    args.add_argument(
+        "--show_help",
+        dest="show_help",
+        help="Show help screen",
+        action="store_true"
+    )
+    args.add_argument(
+        "--window_size",
+        dest="window_size",
+        help="Size of screen",
+        type=str,
+        default='normal',
+    )
     return args.parse_args()
 
 
