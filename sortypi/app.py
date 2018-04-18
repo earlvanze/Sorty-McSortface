@@ -110,6 +110,8 @@ def main():
                 print("No recyclables detected. Probably trash.")
                 if not args.no_serial:
                     ser.write(str(4).encode())
+                    while get_status(ser, args) == 'done':
+                        break
 
             show(frame)
 

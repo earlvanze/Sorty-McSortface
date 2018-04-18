@@ -17,12 +17,20 @@
 #include <Servo.h>
 #include <Stepper.h>
 
+// defines variables
+long duration;
+int distance;
+float numRevolutions = 5.2;
+bool doorOpened = 0;
+int stepperSpeed = 240;
+int maxDistance = 40;
 const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
 // for your motor
 
 // initialize the stepper library on pins 8 through 11:
 Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
 
+// defines pins numbers
 int item; // variable to store bin selection
 int servoPin = 3; //declare pin for the servo
 int servoDelay = 800; //delay to allow the servo to reach position;
@@ -30,16 +38,8 @@ int val = 0;
 int sensorPin = 2;
 int ledPin = 13;
 int pirState = LOW;
-
-// defines pins numbers
 const int trigPin = 5;
 const int echoPin = 6;
-
-// defines variables
-long duration;
-int distance;
-int numRevolutions = 5;
-bool doorOpened = 0;
 
 Servo myServo; // create a servo object called myServo
 
@@ -50,7 +50,7 @@ void setup() {
   pinMode(sensorPin, INPUT);     // declare sensor as input
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
-  myStepper.setSpeed(60);  // set the stepper speed at 60 rpm
+  myStepper.setSpeed(stepperSpeed);  // set the stepper speed (rpm)
 }
 
 int checkDistance() {
@@ -66,19 +66,28 @@ int checkDistance() {
   // Calculating the distance
   distance= duration*0.034/2;
   // Prints the distance on the Serial Monitor
-  Serial.print("Distance (cm): ");
-  Serial.println(distance);
+//  Serial.print("Distance (cm): ");
+//  Serial.println(distance);
   return distance;
 }
 
+void motorOff() {
+  digitalWrite(8,LOW);
+  digitalWrite(9,LOW);
+  digitalWrite(10,LOW);
+  digitalWrite(11,LOW); 
+}
+
 void openDoor() {
-    myStepper.step(stepsPerRevolution * numRevolutions);
-    doorOpened = 1;
+  myStepper.step(stepsPerRevolution * numRevolutions);
+  doorOpened = 1;
+  motorOff();
 }
 
 void closeDoor() {
-    myStepper.step(-stepsPerRevolution * numRevolutions);
-    doorOpened = 0;
+  myStepper.step(-stepsPerRevolution * numRevolutions);
+  doorOpened = 0;
+  motorOff();
 }
 
 void loop(){
@@ -88,7 +97,7 @@ void loop(){
     myServo.write(90);
     delay(servoDelay);
   }
-  if (!doorOpened && checkDistance() < 30){
+  if (!doorOpened && checkDistance() < maxDistance){
     openDoor();
   }
   val = digitalRead(sensorPin);  // read input value
@@ -120,7 +129,7 @@ void loop(){
       if (item == 3 || item == 4) {
         Serial.println("item = 3 or 4 // paper or trash");
         digitalWrite(ledPin, HIGH);
-        myServo.write(25);
+        myServo.write(0);
         delay(servoDelay);
         myServo.write(90);
         delay(servoDelay);
