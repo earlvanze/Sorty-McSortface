@@ -95,7 +95,7 @@ def user_args():
         dest="window_name",
         help="Window name",
         type=str,
-        default='normal',
+        default='Sorty',
     )
     return args.parse_args()
 
