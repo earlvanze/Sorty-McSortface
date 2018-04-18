@@ -20,29 +20,21 @@ PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 
 
 def move_motors(gcode, ser_grbl):
-    ser_grbl.write("\r\n\r\n".encode())
-    time.sleep(2)
-    ser_grbl.flushInput()
-    for line in gcode:
-        l = line.strip()
-        print('Sending: ' + l)
-        ser_grbl.write(l + '\n'.encode())
-        grbl_out = ser_grbl.readline()
-        print(' : ' + grbl_out.strip())
-    time.sleep(2)
-
-
-def set_ports(args):
-    if args.use_jetsoncam:
-        GRBL_PORT = '/dev/ttyS0'
-        SERIAL_PORT = '/dev/ttyS1'
-    elif args.picamera or args.debian:
-        GRBL_PORT = '/dev/ttyACM0'
-        SERIAL_PORT = '/dev/ttyACM1'
-    else:
-        GRBL_PORT = '/dev/tty.usbmodem1421'
-        SERIAL_PORT = '/dev/tty.usbmodem1411'
-    return GRBL_PORT, SERIAL_PORT
+    if not args.no_serial:
+        try:
+            ser_grbl.write("\r\n\r\n")
+            time.sleep(2)
+            ser_grbl.flushInput()
+            for line in gcode:
+                l = line.strip()
+                print('Sending: ' + l)
+                ser_grbl.write(l + '\n')
+                grbl_out = ser_grbl.readline()
+                print(' : ' + grbl_out.strip())
+            time.sleep(2)
+        except:
+            print ("Unable to communicate with GRBL")
+            raise
 
 
 def get_status(ser, args):
@@ -52,18 +44,34 @@ def get_status(ser, args):
     return "still"
 
 
-def set_serial(args, SERIAL_PORT, GRBL_PORT):
+def set_serial(args):
+    if args.use_jetsoncam:
+        GRBL_PORT = '/dev/ttyS0'
+        SERIAL_PORT = '/dev/ttyS1'
+    elif args.picamera or args.debian:
+        GRBL_PORT = '/dev/ttyACM0'
+        SERIAL_PORT = '/dev/ttyACM1'
+    else:
+        GRBL_PORT = '/dev/tty.usbmodem1421'
+        SERIAL_PORT = '/dev/tty.usbmodem1411'
     if not args.no_serial:
-        ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
-        ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
-        return ser, ser_grbl
-    return None, None
+        try:
+            ser = serial.Serial(SERIAL_PORT, BAUD, timeout=TOUT)
+        except:
+            print("Unable to connect to Arduino")
+            raise
+            ser = None
+        try:
+            ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
+        except:
+            print("Unable to connect to GRBL")
+            ser_grbl = None
+    return ser, ser_grbl
 
 
 def main():
     print("OpenCV version: {}".format(cv2.__version__))
-    GRBL_PORT, SERIAL_PORT = set_ports(args)
-    ser, ser_grbl = set_serial(args, SERIAL_PORT, GRBL_PORT)
+    ser, ser_grbl = set_serial(args)
 
     # load tensorflow graph
     detection_graph = tf.Graph()
@@ -104,14 +112,14 @@ def main():
                 write_to_S3(aws, predictions, "sorty-logs", fname)
                 gcode = convert_bbox_to_gcode(predictions)
                 print(f"{status} \n {gcode}")
-#                if not args.no_serial:
-#                    move_motors(gcode, ser_grbl)
+                move_motors(gcode, ser_grbl)
             else:
                 print("No recyclables detected. Probably trash.")
                 if not args.no_serial:
                     ser.write(str(4).encode())
-                    while get_status(ser, args) == 'done':
-                        break
+                    while get_status(ser, args) != 'done':
+                        if get_status(ser, args) == 'done':
+                            break
 
             show(frame)
 
