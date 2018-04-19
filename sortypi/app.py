@@ -49,8 +49,8 @@ def set_serial(args):
         GRBL_PORT = '/dev/ttyS0'
         SERIAL_PORT = '/dev/ttyS1'
     elif args.picamera or args.debian:
-        GRBL_PORT = '/dev/ttyACM0'
-        SERIAL_PORT = '/dev/ttyACM1'
+        GRBL_PORT = '/dev/ttyACM1'
+        SERIAL_PORT = '/dev/ttyACM0'
     else:
         GRBL_PORT = '/dev/tty.usbmodem1421'
         SERIAL_PORT = '/dev/tty.usbmodem1411'

@@ -21,7 +21,7 @@
 long duration;
 int distance;
 float numRevolutions = 5.2;
-bool doorOpened = 0;
+bool doorOpened = 1;
 int stepperSpeed = 240;
 int maxDistance = 40;
 const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
@@ -97,9 +97,6 @@ void loop(){
     myServo.write(90);
     delay(servoDelay);
   }
-  if (!doorOpened && checkDistance() < maxDistance){
-    openDoor();
-  }
   val = digitalRead(sensorPin);  // read input value
   if (val == HIGH) {            // check if the input is HIGH
     digitalWrite(ledPin, HIGH);  // turn LED ON
@@ -135,6 +132,7 @@ void loop(){
         delay(servoDelay);
         digitalWrite(ledPin, LOW);
         Serial.println("done");
+        openDoor();
       }
       else {
         Serial.println("Not a valid option");
@@ -142,3 +140,4 @@ void loop(){
     }
   }
 }
+
