@@ -1,6 +1,7 @@
 import json
 import boto3
-import os
+import configparser
+
 
 def serialize_json_for_s3(data):
     output = []
@@ -25,8 +26,11 @@ def write_to_S3(session, data, bucket, path):
 
 
 def connect_to_aws():
+    config = configparser.ConfigParser()
+    AWS_ACCESS_KEY_ID = config['AWS']['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = config['AWS']['AWS_SECRET_ACCESS_KEY']
     sess = boto3.Session(
-        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
     return sess

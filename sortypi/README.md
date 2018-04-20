@@ -3,7 +3,10 @@
 ### Setup AWS configs
 
 ```bash
-# config.ini
+# setup your config.ini file
+[AWS]
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = YOUR_AWS_SECRET_ACCESS_KEY
 ```
 
 ### Download pretrained models from tensorflow's model zoo.
