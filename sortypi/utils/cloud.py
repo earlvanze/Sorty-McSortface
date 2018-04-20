@@ -4,6 +4,14 @@ import configparser
 import base64
 
 
+def base64_encode_image(img):
+    img_shape = img.shape
+    img_dtype = img.dtype
+    base64_bytes = base64.b64encode(img)
+    base64_string = base64_bytes.decode('utf-8')
+    return img_shape, img_dtype, base64_string
+
+
 def serialize_json_for_s3(data):
     output = {}
     for _, pred in enumerate(data):
@@ -14,14 +22,6 @@ def serialize_json_for_s3(data):
         record['score'] = str(pred['score'])
         output['prediction'] = record
     return output
-
-
-def base64_encode_image(img):
-    img_shape = img.shape
-    img_dtype = img.dtype
-    base64_bytes = base64.b64encode(img)
-    base64_string = base64_bytes.decode('utf-8')
-    return img_shape, img_dtype, base64_string
 
 
 def write_to_S3(session, predictions, img, bucket, path):
@@ -39,12 +39,8 @@ def write_to_S3(session, predictions, img, bucket, path):
 def connect_to_aws():
     config = configparser.ConfigParser()
     config.read('config.ini')
-    print(config.sections())
-    AWS_ACCESS_KEY_ID = config['AWS']['AWS_ACCESS_KEY_ID']
-    AWS_SECRET_ACCESS_KEY = config['AWS']['AWS_SECRET_ACCESS_KEY']
-    print(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     sess = boto3.Session(
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        aws_access_key_id=config['AWS']['AWS_ACCESS_KEY_ID'],
+        aws_secret_access_key=config['AWS']['AWS_SECRET_ACCESS_KEY'],
     )
     return sess
