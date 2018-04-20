@@ -120,7 +120,7 @@ def main():
             if len(predictions) > 0:
                 ts = dt.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
                 fname = f"{ts}.json"
-                write_to_S3(aws, predictions, "sorty-logs", fname)
+                write_to_S3(aws, predictions, frame, "sorty-logs", fname)
                 gcode = convert_bbox_to_gcode(predictions)
                 print(f"{status} \n {gcode}")
                 move_motors(gcode, ser_grbl)

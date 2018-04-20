@@ -1,25 +1,36 @@
 import json
 import boto3
 import configparser
+import base64
 
 
 def serialize_json_for_s3(data):
-    output = []
-    print(data)
-    for idx, pred in enumerate(data):
+    output = {}
+    for _, pred in enumerate(data):
         record = {}
         record['bbox'] = [str(i) for i in pred['bbox']]
         record['id'] = str(pred['id'])
         record['class'] = str(pred['class'])
         record['score'] = str(pred['score'])
-        output.append(record)
+        output['prediction'] = record
     return output
 
 
-def write_to_S3(session, data, bucket, path):
-    output = serialize_json_for_s3(data)
-    print("data", data)
-    print("output", output)
+def base64_encode_image(img):
+    img_shape = img.shape
+    img_dtype = img.dtype
+    base64_bytes = base64.b64encode(img)
+    base64_string = base64_bytes.decode('utf-8')
+    return img_shape, img_dtype, base64_string
+
+
+def write_to_S3(session, predictions, img, bucket, path):
+    output = serialize_json_for_s3(predictions)
+    print("predictions", predictions)
+    img_shape, img_dtype, base64_string = base64_encode_image(img)
+    output['image'] = base64_string
+    output['img_dtype'] = str(img_dtype)
+    output['img_shape'] = str(img_shape)
     s3 = session.resource('s3')
     obj = s3.Object(bucket, path)
     obj.put(Body=json.dumps(output))
@@ -27,8 +38,11 @@ def write_to_S3(session, data, bucket, path):
 
 def connect_to_aws():
     config = configparser.ConfigParser()
+    config.read('config.ini')
+    print(config.sections())
     AWS_ACCESS_KEY_ID = config['AWS']['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = config['AWS']['AWS_SECRET_ACCESS_KEY']
+    print(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     sess = boto3.Session(
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
