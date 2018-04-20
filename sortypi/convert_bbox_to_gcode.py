@@ -29,7 +29,7 @@ def convert_bbox_to_gcode(predictions):
     xdisp = IMAGE_WIDTH * xMiddle
     ydisp = IMAGE_HEIGHT * yMiddle
 
-    gcode = "F300 G90\n"   # set motor speed in # of steps/minute
+    gcode = "F250 G90\n"   # set motor speed in # of steps/minute
     gcode += "G1 X7 Y2\n"  # move to offset (0,0) top left corner of camera image
     gcode += "G1 X{} Y{}\n".format(xdisp, ydisp)  # move to center of bbox
 

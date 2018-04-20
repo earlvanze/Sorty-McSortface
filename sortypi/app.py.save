@@ -22,30 +22,25 @@ PATH_TO_CKPT = os.path.join(CWD_PATH, GRAPH_NAME)
 def move_motors(gcode, ser_grbl):
     if not args.no_serial:
         try:
-            ser_grbl.write("\r\n\r\n".encode('utf-8'))
+            ser_grbl.write("\r\n\r\n").encode()
             time.sleep(2)
             ser_grbl.flushInput()
-            gcodeArray = gcode.split('\n')
-            for line in gcodeArray:
+            for line in gcode:
                 l = line.strip()
                 print('Sending: ' + l)
-                ser_grbl.write((l + '\n').encode('utf-8'))
-                grbl_out = ser_grbl.readline().decode('utf-8')
-                print(' : ' + grbl_out.strip())
+                ser_grbl.write(l + '\n').encode()
+                grbl_out = ser_grbl.readline()
+                print(' : ' + grbl_out.decode('utf-8').strip())
             time.sleep(2)
         except:
-            print("Unable to communicate with GRBL")
+            print ("Unable to communicate with GRBL")
             raise
 
 
 def get_status(ser, args):
     if not args.no_serial:
-        try:
-            status = ser.readline().decode('ISO-8859-1').strip("\r\n")
-            return status
-        except:
-            print("Unable to read Arduino status")
-            raise
+        status = ser.readline().decode('utf-8').strip("\r\n")
+        return status
     return "still"
 
 
@@ -54,8 +49,8 @@ def set_serial(args):
         GRBL_PORT = '/dev/ttyS0'
         SERIAL_PORT = '/dev/ttyS1'
     elif args.picamera or args.debian:
-        GRBL_PORT = '/dev/ttyACM0'
-        SERIAL_PORT = '/dev/ttyACM1'
+        GRBL_PORT = '/dev/ttyACM1'
+        SERIAL_PORT = '/dev/ttyACM0'
     else:
         GRBL_PORT = '/dev/tty.usbmodem1421'
         SERIAL_PORT = '/dev/tty.usbmodem1411'
@@ -66,17 +61,13 @@ def set_serial(args):
             print("Unable to connect to Arduino")
             raise
             ser = None
-        else:
-            print(ser)
         try:
             ser_grbl = serial.Serial(GRBL_PORT, GRBL_BAUD, timeout=TOUT)
         except:
             print("Unable to connect to GRBL")
             ser_grbl = None
         else:
-            print(ser_grbl)
-    else:
-        ser, ser_grbl = None, None
+            print
     return ser, ser_grbl
 
 
