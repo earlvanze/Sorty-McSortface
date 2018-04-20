@@ -15,3 +15,9 @@ download_ssd_inception:
 	wget -O inference_graph.tar.gz https://s3.amazonaws.com/sorty-ai/trained_models/ssd_inception_v2_coco/v1/inference_graph.tar.gz
 	tar -xzvf inference_graph.tar.gz
 	rm -rf inference_graph.tar.gz
+
+.PHONY: clean
+
+clean:
+	find . -name '*.pyc' -exec rm -rf {} +
+	find . -name '*__pycache__' -exec rm -rf {} +

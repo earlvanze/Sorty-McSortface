@@ -104,3 +104,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# ignore config file
+config.ini
+config.mine.ini

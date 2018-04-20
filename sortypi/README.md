@@ -1,21 +1,29 @@
 # Getting started
 
-### Download pretrained models from tensorflow's model zoo. 
+### Setup AWS configs
+
+```bash
+# config.ini
+```
+
+### Download pretrained models from tensorflow's model zoo.
 
 ```bash
 make download_models
 ```
+
 Currently, we support single shoot detection with mobilenets and inception.
 
 ### Download the inference graph for your model of choice.
 
-
 #### For mobilenets
+
 ```bash
 make download_ssd_mobilenets
 ```
 
 #### For inception
+
 ```bash
 make download_ssd_inception
 ```
