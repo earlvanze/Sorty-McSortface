@@ -122,7 +122,7 @@ def main():
                 fname = f"{ts}.json"
                 write_to_S3(aws, predictions, frame, "sorty-logs", fname)
                 gcode = convert_bbox_to_gcode(predictions)
-                print(f"{status} \n {gcode}")
+                print(f"{status} \n {predictions} \n {gcode}")
                 move_motors(gcode, ser_grbl)
             else:
                 print("No recyclables detected. Probably trash.")

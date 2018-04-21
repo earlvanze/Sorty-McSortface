@@ -11,7 +11,7 @@ def convert_bbox_to_gcode(predictions):
 # TO-DO: Z-AXIS!
 
     bbox = predictions[0]['bbox']
-    class_prediction = str(predictions[0]['class']).encode()
+    class_prediction = predictions[0]['class']
     ymin = float(bbox[0])
     xmin = float(bbox[1])
     ymax = float(bbox[2])
@@ -29,15 +29,16 @@ def convert_bbox_to_gcode(predictions):
     xdisp = IMAGE_WIDTH * xMiddle
     ydisp = IMAGE_HEIGHT * yMiddle
 
-    gcode = "F250 G90\n"   # set motor speed in # of steps/minute
-    gcode += "G1 X7 Y2\n"  # move to offset (0,0) top left corner of camera image
+    gcode = "F200 G90\n"   # set motor speed in # of steps/minute
+    gcode += "G1 X9 Y2\n"  # move to offset (0,0) top left corner of camera image
     gcode += "G1 X{} Y{}\n".format(xdisp, ydisp)  # move to center of bbox
+    gcode += "G4 P1\n"      # Pause for s seconds (Ps)
 
     # move to left bin or right bin based on class_prediction
 
     class_switcher = {
-        1: "G1 X3\n",
-        2: "G1 X19\n"
+        1: "G1 X{}\n".format(-xdisp),
+        2: "G1 X19\n".format(xdisp+10)
     }
     gcode += class_switcher.get(class_prediction, "")
 

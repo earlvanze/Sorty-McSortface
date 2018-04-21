@@ -1,0 +1,116 @@
+ python app.py -dOpenCV version: 3.4.0
+Serial<id=0x7f2f856cc048, open=True>(port='/dev/ttyACM1', baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=0.2, xonxoff=False, rtscts=False, dsrdtr=False)
+Serial<id=0x7f2f63994a90, open=True>(port='/dev/ttyACM0', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=0.2, xonxoff=False, rtscts=False, dsrdtr=False)
+2018-04-20 20:29:10.671980: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+^[predictions [{'id': 0, 'score': 0.9999889, 'class': 1, 'label': 'metal', 'bbox': [0.53936446, 0.50432396, 0.8284035, 0.67835164], 'time': '2018-04-20T20:29:21:978990'}]
+0.5393644571304321 0.5043239593505859 0.8284034729003906 0.678351640701294
+[0.53936446, 0.50432396, 0.8284035, 0.67835164]
+0.59 0.68
+still 
+ [{'id': 0, 'score': 0.9999889, 'class': 1, 'label': 'metal', 'bbox': [0.53936446, 0.50432396, 0.8284035, 0.67835164], 'time': '2018-04-20T20:29:21:978990'}] 
+ F200 G90
+G1 X9 Y2
+G1 X5.8999999999999995 Y3.4000000000000004
+G4 P1
+G1 X-3.8999999999999995
+G4 P1
+G28 X0 Y0
+Sending: F200 G90
+ : ok
+Sending: G1 X9 Y2
+ : ok
+Sending: G1 X5.8999999999999995 Y3.4000000000000004
+ : ok
+Sending: G4 P1
+ : 
+Sending: G1 X-3.8999999999999995
+ : 
+Sending: G4 P1
+ : 
+Sending: G28 X0 Y0
+ : 
+No recyclables detected. Probably trash.
+predictions [{'id': 0, 'score': 0.9999603, 'class': 1, 'label': 'metal', 'bbox': [0.33211875, 0.5840746, 0.60623837, 0.7433642], 'time': '2018-04-20T20:29:54:290965'}, {'id': 1, 'score': 0.99967563, 'class': 1, 'label': 'metal', 'bbox': [0.8199997, 0.3708135, 0.995193, 0.57468754], 'time': '2018-04-20T20:29:54:290965'}]
+0.3321187496185303 0.5840746164321899 0.6062383651733398 0.7433642148971558
+[0.33211875, 0.5840746, 0.60623837, 0.7433642]
+0.66 0.47
+still 
+ [{'id': 0, 'score': 0.9999603, 'class': 1, 'label': 'metal', 'bbox': [0.33211875, 0.5840746, 0.60623837, 0.7433642], 'time': '2018-04-20T20:29:54:290965'}, {'id': 1, 'score': 0.99967563, 'class': 1, 'label': 'metal', 'bbox': [0.8199997, 0.3708135, 0.995193, 0.57468754], 'time': '2018-04-20T20:29:54:290965'}] 
+ F200 G90
+G1 X9 Y2
+G1 X6.6000000000000005 Y2.3499999999999996
+G4 P1
+G1 X-4.6000000000000005
+G4 P1
+G28 X0 Y0
+Sending: F200 G90
+ : ok
+Sending: G1 X9 Y2
+ : ok
+Sending: G1 X6.6000000000000005 Y2.3499999999999996
+ : ok
+Sending: G4 P1
+ : 
+Sending: G1 X-4.6000000000000005
+ : 
+Sending: G4 P1
+ : 
+Sending: G28 X0 Y0
+ : 
+No recyclables detected. Probably trash.
+predictions [{'id': 0, 'score': 0.9999049, 'class': 1, 'label': 'metal', 'bbox': [0.48904055, 0.55999684, 0.76384705, 0.73933995], 'time': '2018-04-20T20:30:28:126425'}, {'id': 1, 'score': 0.96044385, 'class': 2, 'label': 'plastic', 'bbox': [0.5436537, 0.33810377, 0.9780674, 0.74979484], 'time': '2018-04-20T20:30:28:126425'}]
+0.4890405535697937 0.5599968433380127 0.7638470530509949 0.7393399477005005
+[0.48904055, 0.55999684, 0.76384705, 0.73933995]
+0.65 0.63
+still 
+ [{'id': 0, 'score': 0.9999049, 'class': 1, 'label': 'metal', 'bbox': [0.48904055, 0.55999684, 0.76384705, 0.73933995], 'time': '2018-04-20T20:30:28:126425'}, {'id': 1, 'score': 0.96044385, 'class': 2, 'label': 'plastic', 'bbox': [0.5436537, 0.33810377, 0.9780674, 0.74979484], 'time': '2018-04-20T20:30:28:126425'}] 
+ F200 G90
+G1 X9 Y2
+G1 X6.5 Y3.15
+G4 P1
+G1 X-4.5
+G4 P1
+G28 X0 Y0
+Sending: F200 G90
+ : ok
+Sending: G1 X9 Y2
+ : ok
+Sending: G1 X6.5 Y3.15
+ : ok
+Sending: G4 P1
+ : 
+Sending: G1 X-4.5
+ : 
+Sending: G4 P1
+ : 
+Sending: G28 X0 Y0
+ : 
+predictions [{'id': 0, 'score': 0.9998559, 'class': 1, 'label': 'metal', 'bbox': [0.48796272, 0.5593755, 0.7663164, 0.73750174], 'time': '2018-04-20T20:30:48:553743'}]
+0.4879627227783203 0.559375524520874 0.7663164138793945 0.7375017404556274
+[0.48796272, 0.5593755, 0.7663164, 0.73750174]
+0.65 0.63
+still 
+ [{'id': 0, 'score': 0.9998559, 'class': 1, 'label': 'metal', 'bbox': [0.48796272, 0.5593755, 0.7663164, 0.73750174], 'time': '2018-04-20T20:30:48:553743'}] 
+ F200 G90
+G1 X9 Y2
+G1 X6.5 Y3.15
+G4 P1
+G1 X-4.5
+G4 P1
+G28 X0 Y0
+Sending: F200 G90
+ : ok
+Sending: G1 X9 Y2
+ : ok
+Sending: G1 X6.5 Y3.15
+ : ok
+Sending: G4 P1
+ : 
+Sending: G1 X-4.5
+ : 
+Sending: G4 P1
+ : 
+Sending: G28 X0 Y0
+ : 
+No recyclables detected. Probably trash.
+
