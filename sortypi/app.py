@@ -5,7 +5,6 @@ import serial
 import tensorflow as tf
 from utils.cloud import write_to_S3, connect_to_aws
 from inference import detect_objects, serialize
-from datetime import datetime as dt
 from utils.app_utils import FPS
 from commands import args
 from convert_bbox_to_gcode import convert_bbox_to_gcode
@@ -80,6 +79,15 @@ def set_serial(args):
     return ser, ser_grbl
 
 
+def get_rbg_copy(frame):
+    return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+
+def send_motor_home(msg="No recyclables detected."):
+    print(msg)
+    return "G28 X0 Y0"
+
+
 def main():
     print("OpenCV version: {}".format(cv2.__version__))
     ser, ser_grbl = set_serial(args)
@@ -108,30 +116,27 @@ def main():
         # read Arduino PIR sensor state
         status = get_status(ser, args)
         raw_frame = video_capture.read()
-        rgb_frame = cv2.cvtColor(raw_frame, cv2.COLOR_RGB2BGR)
-
+        rgb_frame = get_rbg_copy(raw_frame)
         if show_help:
             help_text(rgb_frame)
 
         if status == 'still':
             frame, output = detect_objects(rgb_frame, sess, detection_graph)
             predictions = serialize(output)
-            # Save predictions to S3
-            if len(predictions) > 0:
-                ts = dt.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
-                fname = f"{ts}.json"
-                write_to_S3(aws, predictions, frame, "sorty-logs", fname)
+            for prediction in predictions:
                 gcode = convert_bbox_to_gcode(predictions)
                 print(f"{status} \n {predictions} \n {gcode}")
                 move_motors(gcode, ser_grbl)
-            else:
-                print("No recyclables detected. Probably trash.")
-                if not args.no_serial:
-                    ser.write(str(4).encode())
-                    while get_status(ser, args) != 'done':
-                        if get_status(ser, args) == 'done':
-                            break
 
+            send_motor_home(msg="No recyclables detected.")
+
+            if not args.no_serial:
+                ser.write(str(4).encode())
+                while get_status(ser, args) != 'done':
+                    if get_status(ser, args) == 'done':
+                        break
+            if predictions:
+                write_to_S3(aws, predictions, frame)
             show(frame)
 
         elif status == 'ready':
