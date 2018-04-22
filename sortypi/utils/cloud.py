@@ -2,6 +2,8 @@ import json
 import boto3
 import configparser
 import base64
+from datetime import datetime as dt
+from commands import args
 
 
 def base64_encode_image(img):
@@ -24,7 +26,9 @@ def serialize_json_for_s3(data):
     return output
 
 
-def write_to_S3(session, predictions, img, bucket, path):
+def write_to_S3(session, predictions, img, bucket=args.bucket_name):
+    ts = dt.now().strftime('%Y-%m-%d_%H:%M:%S.%f')
+    path = f"{ts}.json"
     output = serialize_json_for_s3(predictions)
     print("predictions", predictions)
     img_shape, img_dtype, base64_string = base64_encode_image(img)
