@@ -97,6 +97,13 @@ def user_args():
         type=str,
         default='Sorty',
     )
+    args.add_argument(
+        "--s3_bucket",
+        dest="bucket_name",
+        help="Name of s3 bucket",
+        type=str,
+        default='sorty-logs',
+    )
     return args.parse_args()
 
 
